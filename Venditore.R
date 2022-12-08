@@ -22,3 +22,4 @@ Venditore <- setRefClass("Venditore",
                              }
                            }
                          ))
+
