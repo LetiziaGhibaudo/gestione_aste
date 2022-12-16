@@ -1,3 +1,6 @@
+rm(list = ls())
+setwd("~/Documents/GitHub/gestione_aste")
+source("~/Documents/GitHub/gestione_aste/Venditore.R")
 Anagrafica <- setRefClass("Anagrafica",
                           fields = list(vendors = "list" ), 
                           methods = list(
@@ -5,12 +8,12 @@ Anagrafica <- setRefClass("Anagrafica",
                           
                             load = function(file_name) {
                             path <- getwd()
-                            myfile = file(paste(path,"/prova.txt", sep = ""))
+                            myfile = file(paste(path,"/", file_name, sep = ""))
                             lines = readLines(myfile)
                             entries = length(lines)
                             #print(lines)
                             for (i in 1:entries) {
-                              venditore = venditore$new()
+                              venditore = Venditore$new()
                               venditore$unserialize(lines[i])
                               vendors <<- c(vendors, venditore)
                              
@@ -18,12 +21,15 @@ Anagrafica <- setRefClass("Anagrafica",
                             },
                             show = function() {
                               heather <- "ID, name, surname, address"
-                              x <- c(heather, lines)
-                              writeLines(x)
+                              print(heather)
+                              for(venditore_attuale in vendors) {
+                                print(venditore_attuale$serialize())
+                              }
+                                
+                              
                             },
-                            addVenditore = function() {
-                                newvendor <- append(x, nuovoVenditore, after = length(x))
-                                #newvendor <- append(x, Venditore$new, after = length(x))
+                            addVenditore = function(venditore) {
+                              vendors <<- c(vendors, venditore)
                             }
                                 
                               
@@ -42,7 +48,7 @@ Anagrafica <- setRefClass("Anagrafica",
 path <- getwd()
 
 
-write.table(x = "987654, Mario Rossi, Via Roma 1\n123456 Irene Bianchi, Via Garibaldi 2\n234567, Elisa Verdi, Via Marconi 3",
+write.table(x = "987654, Mario, Rossi, Via Roma 1\n123456, Irene, Bianchi, Via Garibaldi 2\n234567, Elisa, Verdi, Via Marconi 3",
             file = paste(path, "/prova.txt", sep = ""),
             row.names = FALSE, col.names = FALSE, quote = FALSE)
 
@@ -51,11 +57,11 @@ write.table(x = "987654, Mario Rossi, Via Roma 1\n123456 Irene Bianchi, Via Gari
 #prova_txt
 
 anagrafica = Anagrafica$new()
-anagrafica$load("/Users/god/Download/venditori_ufficiale.csv")
+anagrafica$load("prova.txt")
 anagrafica$show()
 
 
-nuovoVenditore = Venditore$new(n = "Filippo", s = "Verdi", address = "Casa di Filippo 55")
+nuovoVenditore = Venditore$new(n = "Filippo", s = "Verdi", a = "Casa di Filippo 55")
 anagrafica$addVenditore(nuovoVenditore)
 anagrafica$show()
 
