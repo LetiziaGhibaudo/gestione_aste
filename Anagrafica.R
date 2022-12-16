@@ -8,15 +8,31 @@ Anagrafica <- setRefClass("Anagrafica",
                             myfile = file(paste(path,"/prova.txt", sep = ""))
                             lines = readLines(myfile)
                             entries = length(lines)
+                            #print(lines)
                             for (i in 1:entries) {
                               venditore = venditore$new()
                               venditore$unserialize(lines[i])
                               vendors <<- c(vendors, venditore)
-                             print(lines)
+                             
                              }
+                            },
+                            show = function() {
+                              heather <- "ID, name, surname, address"
+                              x <- c(heather, lines)
+                              writeLines(x)
+                            },
+                            addVenditore = function() {
+                                newvendor <- append(x, nuovoVenditore, after = length(x))
+                                #newvendor <- append(x, Venditore$new, after = length(x))
                             }
+                                
+                              
+                              
                              
                             
+                            
+                             
+                          
                           )
 )
                           
@@ -33,5 +49,14 @@ write.table(x = "987654, Mario Rossi, Via Roma 1\n123456 Irene Bianchi, Via Gari
 # readLines function
 #prova_txt <- readLines(paste(path, "/prova.txt", sep = ""))
 #prova_txt
+
+anagrafica = Anagrafica$new()
+anagrafica$load("/Users/god/Download/venditori_ufficiale.csv")
+anagrafica$show()
+
+
+nuovoVenditore = Venditore$new(n = "Filippo", s = "Verdi", address = "Casa di Filippo 55")
+anagrafica$addVenditore(nuovoVenditore)
+anagrafica$show()
 
 

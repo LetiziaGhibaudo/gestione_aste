@@ -5,7 +5,7 @@ Venditore <- setRefClass("Venditore",
                                        address = "character"
                          ),
                          methods = list(
-                           initialize = function(n, s) {
+                           initialize = function(n, s,...) {
                              h_ID <<- sample(1:1000000, 1)
                              name <<- n
                              surname <<- s
@@ -22,4 +22,5 @@ Venditore <- setRefClass("Venditore",
                              }
                            }
                          ))
+
 
