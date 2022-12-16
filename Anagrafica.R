@@ -1,6 +1,3 @@
-rm(list = ls())
-setwd("~/Documents/GitHub/gestione_aste")
-source("~/Documents/GitHub/gestione_aste/Venditore.R")
 Anagrafica <- setRefClass("Anagrafica",
                           fields = list(vendors = "list" ), 
                           methods = list(
@@ -43,26 +40,5 @@ Anagrafica <- setRefClass("Anagrafica",
 )
                           
 
-
-# Example test                               
-path <- getwd()
-
-
-write.table(x = "987654, Mario, Rossi, Via Roma 1\n123456, Irene, Bianchi, Via Garibaldi 2\n234567, Elisa, Verdi, Via Marconi 3",
-            file = paste(path, "/prova.txt", sep = ""),
-            row.names = FALSE, col.names = FALSE, quote = FALSE)
-
-# readLines function
-#prova_txt <- readLines(paste(path, "/prova.txt", sep = ""))
-#prova_txt
-
-anagrafica = Anagrafica$new()
-anagrafica$load("prova.txt")
-anagrafica$show()
-
-
-nuovoVenditore = Venditore$new(n = "Filippo", s = "Verdi", a = "Casa di Filippo 55")
-anagrafica$addVenditore(nuovoVenditore)
-anagrafica$show()
 
 
