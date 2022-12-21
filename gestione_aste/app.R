@@ -16,24 +16,31 @@ library(shiny)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("gestione_aste"),
 
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
+   
+        # 
         mainPanel(
-           plotOutput("distPlot")
+            tabsetPanel(
+                tabPanel("Venditori", verbatimTextOutput("Venditori")),
+                
+                tabPanel("Add Venditore", verbatimTextOutput("Add Venditore"),
+                fluidRow(
+                    column(12,
+                           h3("New vendor"),
+                           actionButton("addVendor", "Add vendor"),
+                           br(),
+                           br(),
+                           submitButton("Save"))
+                )
+                )
+               
+            )
         )
-    )
 )
+
+
+
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
