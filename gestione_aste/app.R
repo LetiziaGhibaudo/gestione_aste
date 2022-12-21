@@ -22,13 +22,19 @@ ui <- fluidPage(
         # 
         mainPanel(
             tabsetPanel(
-                tabPanel("Venditori", verbatimTextOutput("Venditori")),
+                tabPanel("Venditori", verbatimTextOutput("Venditori"),
+                fluidRow(
+                    column(12,
+                           dataTableOutput("tabellaVenditori"))
+                )         
+                ),
                 
                 tabPanel("Add Venditore", verbatimTextOutput("Add Venditore"),
                 fluidRow(
                     column(12,
                            h3("New vendor"),
                            actionButton("addVendor", "Add vendor"),
+                           br(),
                            br(),
                            br(),
                            submitButton("Save"))
@@ -42,18 +48,15 @@ ui <- fluidPage(
 
 
 
-# Define server logic required to draw a histogram
+# Define server logic 
 server <- function(input, output) {
+    #input <- anagrafica$load("prova.txt")
+    output$tabellaVenditori <- DT::renderDataTable(
+        prova1 <- read.table("~/Documents/GitHub/gestione_aste/gestione_aste/data/prova.txt")
+    )
+    }
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
 
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    })
-}
 
 # Run the application 
 shinyApp(ui = ui, server = server)
