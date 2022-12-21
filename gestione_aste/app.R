@@ -12,14 +12,14 @@ source("~/Documents/GitHub/gestione_aste/Venditore.R")
 source("~/Documents/GitHub/gestione_aste/Anagrafica.R")
 library(shiny)
 
-# Define UI for application that draws a histogram
+# UI 
 ui <- fluidPage(
 
     # Application title
     titlePanel("gestione_aste"),
 
    
-        # 
+        
         mainPanel(
             tabsetPanel(
                 tabPanel("Venditori", verbatimTextOutput("Venditori"),
@@ -48,12 +48,18 @@ ui <- fluidPage(
 
 
 
-# Define server logic 
+# Server 
 server <- function(input, output) {
     #input <- anagrafica$load("prova.txt")
-    output$tabellaVenditori <- DT::renderDataTable(
-        prova1 <- read.table("~/Documents/GitHub/gestione_aste/gestione_aste/data/prova.txt")
+    output$tabellaVenditori <- renderDataTable({
+        prova1 <- source(
+        anagrafica = Anagrafica$new(),
+        anagrafica$load("prova.txt"),
+        anagrafica$show()
+        )
+    }
     )
+    
     }
 
 
