@@ -11,6 +11,7 @@ setwd("~/Documents/GitHub/gestione_aste")
 source("~/Documents/GitHub/gestione_aste/Venditore.R")
 source("~/Documents/GitHub/gestione_aste/Anagrafica.R")
 library(shiny)
+library(DT)
 
 # UI 
 ui <- fluidPage(
@@ -25,7 +26,9 @@ ui <- fluidPage(
                 tabPanel("Venditori", verbatimTextOutput("Venditori"),
                 fluidRow(
                     column(12,
-                           dataTableOutput("tabellaVenditori"))
+                           br(),
+                           br(),
+                           DT::dataTableOutput("tabellaVenditori"))
                 )         
                 ),
                 
@@ -47,21 +50,16 @@ ui <- fluidPage(
 
 
 
-
+data <- read.csv2("prova.csv", header = T, sep=",")
 # Server 
 server <- function(input, output) {
-    #input <- anagrafica$load("prova.txt")
-    output$tabellaVenditori <- renderDataTable({
-        prova1 <- source(
-        anagrafica = Anagrafica$new(),
-        anagrafica$load("prova.txt"),
-        anagrafica$show()
-        )
-    }
+   
+    output$tabellaVenditori <- DT::renderDataTable(
+        
+        data
     )
+}
     
-    }
-
 
 
 # Run the application 
