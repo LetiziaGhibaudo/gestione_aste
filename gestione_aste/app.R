@@ -34,19 +34,33 @@ ui <- fluidPage(
                 
                 tabPanel("Add Venditore", verbatimTextOutput("Add Venditore"),
                 fluidRow(
+                   column(4,
+                          br(),
+                          br(),
+                          textInput("name", h3("Name"),
+                           value = "")),
+                    column(4,
+                           br(),
+                           br(),
+                           textInput("surname", h3("Surname"), 
+                                     value = "")),
+                    column(4,
+                           br(),
+                           br(),
+                           textInput("address", h3("Address"),
+                                     value = "")),
+                 
                     column(12,
                            h3("New vendor"),
                            actionButton("addVendor", "Add vendor"),
-                           br(),
-                           br(),
-                           br(),
-                           submitButton("Save"))
-                )
-                )
+                           helpText("Click to insert the data")
+                ))
+                
+                ))))
                
-            )
-        )
-)
+            
+        
+
 
 
 
@@ -58,6 +72,8 @@ server <- function(input, output) {
         
         data
     )
+    
+    
 }
     
 
