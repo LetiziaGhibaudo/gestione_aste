@@ -13,6 +13,9 @@ source("~/Documents/GitHub/gestione_aste/Anagrafica.R")
 library(shiny)
 library(DT)
 
+anagrafica <- Anagrafica$new()
+anagrafica$load("prova.csv")
+
 # UI 
 ui <- fluidPage(
 
@@ -63,8 +66,7 @@ ui <- fluidPage(
 
 
 
-
-data <- read.csv2("prova.csv", header = T, sep=",")
+data <- anagrafica$getCsvContent()
 # Server 
 server <- function(input, output) {
    
@@ -72,7 +74,13 @@ server <- function(input, output) {
         
         data
     )
-    
+    observeEvent(input$addVendor, {
+       print(input$name)
+       data <- anagrafica$getCsvContent()
+       output$tabellaVenditori <- DT::renderDataTable(
+           data)
+       
+    })
     
 }
     

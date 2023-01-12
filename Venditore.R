@@ -10,8 +10,12 @@ Venditore <- setRefClass("Venditore",
                              name <<- n
                              surname <<- s
                              address <<- a
-                           }, serialize = function() {
+                           }, 
+                           serialize = function() {
                              return(paste(h_ID, name, surname, address, sep=","))
+                           },
+                           getCsvContent = function() {
+                             return(c(h_ID, name, surname, address))
                            },
                            unserialize = function(line) {
                             list = strsplit(line, ",")
