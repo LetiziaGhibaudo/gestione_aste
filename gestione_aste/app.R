@@ -75,7 +75,10 @@ server <- function(input, output) {
         data
     )
     observeEvent(input$addVendor, {
-       print(input$name)
+       
+        nuovoVenditore = Venditore$new(n = input$name, s = input$surname, a = input$address)
+        
+        new <- anagrafica$addVenditore(nuovoVenditore)
        data <- anagrafica$getCsvContent()
        output$tabellaVenditori <- DT::renderDataTable(
            data)
