@@ -14,104 +14,73 @@ library(shiny)
 library(DT)
 
 anagrafica <- Anagrafica$new()
-anagrafica$load("prova.csv")
 
-# UI 
-ui <- fluidPage(
-
-    # Application title
-    titlePanel("gestione_aste"),
-
-   
-        
-        mainPanel(
-            tabsetPanel(
-                tabPanel("Venditori", verbatimTextOutput("Venditori"),
-                fluidRow(
-                    column(12,
-                           br(),
-                           br(),
-                           DT::dataTableOutput("tabellaVenditori"))
-                )         
-                ),
-                
-                tabPanel("Add Venditore", verbatimTextOutput("Add Venditore"),
-                fluidRow(
-                   column(4,
-                          br(),
-                          br(),
-                          textInput("name", h3("Name"),
-                           value = "")),
-                    column(4,
-                           br(),
-                           br(),
-                           textInput("surname", h3("Surname"), 
-                                     value = "")),
-                    column(4,
-                           br(),
-                           br(),
-                           textInput("address", h3("Address"),
-                                     value = "")),
-                 
-                    column(12,
-                           h3("New vendor"),
-                           actionButton("addVendor", "Add vendor"),
-                           helpText("Click to insert the data")
-                ))
-                
-                ))))
-               
+# UI: The user interface object controls the layout and appearance of the app 
+ui <- fluidPage(# Application title
+    titlePanel("ARTEχNE - auction house solution"),
+    
+    mainPanel(tabsetPanel(
+        tabPanel(
+            "Venditori",
+            verbatimTextOutput("Venditori"),
+            fluidRow(column(
+                12,
+                br(),
+                br(),
+                DT::dataTableOutput("tabellaVenditori")
+            ))
+        ),
+        tabPanel(
+            "Add Venditore",
+            verbatimTextOutput("Add Venditore"),
+            fluidRow(
+                column(4,
+                       br(),
+                       br(),
+                       textInput("name", h3("Name"),
+                                 value = "")),
+                column(4,
+                       br(),
+                       br(),
+                       textInput("surname", h3("Surname"),
+                                 value = "")),
+                column(4,
+                       br(),
+                       br(),
+                       textInput("address", h3("Address"),
+                                 value = "")),
+                column(
+                    12,
+                    h3("New vendor"),
+                    actionButton("addVendor", "Add vendor"),
+                    helpText("Click to insert the data")
+                )
+            )
             
-        
+        )
+    )))
 
-
-
-data <- anagrafica$getCsvContent()
-# Server 
-server <- function(input, output) {
-   
-    output$tabellaVenditori <- DT::renderDataTable(
-        
-        data
-    )
+# Server: The server function contains the instructions to build the app
+server <- function(input, output, session) {
+    anagrafica$load("prova.csv")
+    data <- anagrafica$getCsvContent()
+    output$tabellaVenditori <- DT::renderDataTable(data)
     observeEvent(input$addVendor, {
-       
-        nuovoVenditore = Venditore$new(n = input$name, s = input$surname, a = input$address)
+        nuovoVenditore = Venditore$new(n = input$name,
+                                       s = input$surname,
+                                       a = input$address)
         
-        new <- anagrafica$addVenditore(nuovoVenditore)
-       data <- anagrafica$getCsvContent()
-       output$tabellaVenditori <- DT::renderDataTable(
-           data)
-       
+        anagrafica$addVenditore(nuovoVenditore)
+        anagrafica$save("prova.csv")
+        data <- anagrafica$getCsvContent()
+        output$tabellaVenditori <- DT::renderDataTable(data)
+        updateTextInput(session, "name", value = "")
+        updateTextInput(session, "surname", value = "")
+        updateTextInput(session, "address", value = "")
     })
     
 }
-    
 
-
-# Run the application 
+# Run the application
 shinyApp(ui = ui, server = server)
 
-
-# # Example test                               
-# path <- getwd()
-# 
-# 
-# write.table(x = "987654, Mario, Rossi, Via Roma 1\n123456, Irene, Bianchi, Via Garibaldi 2\n234567, Elisa, Verdi, Via Marconi 3",
-#             file = paste(path, "/prova.txt", sep = ""),
-#             row.names = FALSE, col.names = FALSE, quote = FALSE)
-# 
-# # readLines function
-# #prova_txt <- readLines(paste(path, "/prova.txt", sep = ""))
-# #prova_txt
-# 
-# anagrafica = Anagrafica$new()
-# anagrafica$load("prova.txt")
-# anagrafica$show()
-# 
-# 
-# nuovoVenditore = Venditore$new(n = "Filippo", s = "Verdi", a = "Casa di Filippo 55")
-# anagrafica$addVenditore(nuovoVenditore)
-# anagrafica$show()
-# 
-# 

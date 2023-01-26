@@ -1,3 +1,0 @@
-987654, Mario, Rossi, Via Roma 1
-123456, Irene, Bianchi, Via Garibaldi 2
-234567, Elisa, Verdi, Via Marconi 3

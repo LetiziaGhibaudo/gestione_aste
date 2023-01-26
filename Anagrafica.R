@@ -1,61 +1,59 @@
-Anagrafica <- setRefClass("Anagrafica",
-                          fields = list(vendors = "list" ), 
-                          methods = list(
-                          
-                          
-                            load = function(file_name) {
-                            path <- getwd()
-                            myfile = file(paste(path,"/", file_name, sep = ""))
-                            lines = readLines(myfile)
-                            entries = length(lines)
-                            #print(lines)
-                            for (i in 1:entries) {
-                              venditore = Venditore$new()
-                              venditore$unserialize(lines[i])
-                              vendors <<- c(vendors, venditore)
-                             
-                             }
-                            },
-                            show = function() {
-                              header <- "ID, name, surname, address"
-                              print(header)
-                              for(venditore_attuale in vendors) {
-                                print(venditore_attuale$serialize())
-                              }
-                                
-                              
-                            },
-                            getCsvContent = function() {
-                              i= 1
-                              data <- matrix(0, length(vendors), 4)
-                              
-                              for(venditore_attuale in vendors) {
-                                x <- venditore_attuale$getCsvContent()
-                                data[i, ] <- x
-                                
-                                i = i+1
-                                
-                              }
-                              data = data.frame(data)
-                             colnames(data) <- c("ID", "name", "surname", "address")
-                              return(data)
-                            },
-                            
-                            addVenditore = function(venditore) {
-                              vendors <<- c(vendors, venditore)
-                            }
-                        
-                                
-                              
-                              
-                             
-                            
-                            
-                             
-                          
-                          )
+# The class Anagrafica is responsible for loading and saving the vendors list;
+# Furthermore, we can add a new seller and they will be saved in the csv file as a new row
+Anagrafica <- setRefClass(
+  "Anagrafica",
+  fields = list(vendors = "list"),
+  methods = list(
+    load = function(file_name) {
+      # load is a function that takes the file name as a parameter, for each row creates a 
+      # vendor and calls it (unserialize function), prints and processes all rows one by one, 
+      # loading the csv file
+      path <- getwd()
+      print(paste("load", path))
+      myfile = file(paste(path, "/", file_name, sep = ""))
+      lines = readLines(myfile)
+      entries = length(lines)
+      vendors <<- list()
+      for (i in 1:entries) {
+        venditore = Venditore$new()
+        venditore$unserialize(lines[i])
+        vendors <<- c(vendors, venditore)
+      }
+      close(myfile)
+    },
+    getElementsContent = function() {
+      data <- c()
+      for (venditore_attuale in vendors) {
+        data <- c(venditore_attuale$serialize(), data)
+      }
+      return(data)
+    },
+    getCsvContent = function() {
+      i = 1
+      data <- matrix(0, length(vendors), 4)
+      # we create a matrix that will be filled with the vendors data
+      for (venditore_attuale in vendors) {
+        x <- venditore_attuale$getCsvContent()
+        data[i,] <- x
+        i = i + 1
+      }
+      data = data.frame(data)
+      colnames(data) <-
+        c("ID", "name", "surname", "address")
+      return(data)
+    },
+    addVenditore = function(venditore) {
+      # the function creates a new seller 
+      vendors <<- c(vendors, venditore)
+    },
+    save = function(file_name) {
+      path <- getwd()
+      print(paste("save", path))
+      myfile = file(paste(path, "/", file_name, sep = ""), open = "w+")
+      # the mode "w+" opens the file for reading and writing, truncating file initially
+      print(getElementsContent())
+      writeLines(getElementsContent(), myfile)
+      close(myfile)
+    }
+  )
 )
-                          
-
-
-
