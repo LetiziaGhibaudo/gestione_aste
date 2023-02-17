@@ -11,8 +11,9 @@ Magazzino <- setRefClass(
       pieces <<- list()
       for (i in 1:entries) {
         pezzo = Pezzo$new()
-        pezzo$unserialize(lines[i])
-        pieces <<- c(pieces, pezzo)
+        if((pezzo$unserialize(lines[i])) == TRUE) {
+         pieces <<- c(pieces, pezzo)
+        }
       }
       close(myfile)
     },
@@ -57,8 +58,7 @@ magazzino = Magazzino$new()
 magazzino$load("pezzi.csv")
 magazzino$getCsvContent()
 
-nuovoPezzo = Pezzo$new(venditore_ID = 210723, name = "Bruno Gambone (1936-2021) Set of two bottles - Limited edition", description = "Stoneware 
-Signed 'Gambone Italy' Creation date: circa 1985-1987", height_cm = 30, length_cm = 13.5, width_cm = 13, lowEstimate = 2500, highEstimate = 3500, added = "16/02/2023")
+nuovoPezzo = Pezzo$new(v_ID = 210723, n = "Bruno Gambone (1936-2021) Set of two bottles - Limited edition", d = "Stoneware Signed 'Gambone Italy' Creation date: circa 1985-1987", h_cm = 30, l_cm = 13.5, w_cm = 13, low_e = 2500, high_e = 3500, a = "16/02/2023")
 magazzino$addPezzo(nuovoPezzo)
 magazzino$save("pezzi.csv")
 

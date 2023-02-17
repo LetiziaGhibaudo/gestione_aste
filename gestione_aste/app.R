@@ -14,6 +14,7 @@ library(shiny)
 library(DT)
 
 anagrafica <- Anagrafica$new()
+magazzino <- Magazzino$new()
 
 # UI: The user interface object controls the layout and appearance of the app 
 ui <- fluidPage(# Application title
@@ -28,10 +29,11 @@ ui <- fluidPage(# Application title
                 br(),
                 br(),
                 DT::dataTableOutput("tabellaVenditori")
-            ))
-        ),
-        tabPanel(
-            "Add Venditore",
+            )),
+            br(),
+            br(),
+            br(),
+            h2("New vendor"),
             verbatimTextOutput("Add Venditore"),
             fluidRow(
                 column(4,
@@ -58,7 +60,84 @@ ui <- fluidPage(# Application title
             )
             
         )
-    )))
+    ,
+    
+     tabPanel(
+        "Pezzi",
+        verbatimTextOutput("Pezzi"),
+        fluidRow(column(
+            12,
+            br(),
+            br(),
+            DT::dataTableOutput("tabellaPezzi")
+        )),
+        br(),
+        br(),
+        br(),
+        h2("New piece"),
+        verbatimTextOutput("Add Piece"),
+        fluidRow(
+            column(4,
+                   br(),
+                   br(),
+                   textInput("venditore_ID", h3("Vendor ID"),
+                             value = "")),
+            column(4,
+                   br(),
+                   br(),
+                   textInput("name", h3("Name"),
+                             value = "")),
+            column(4,
+                   br(),
+                   br(),
+                   textInput("description", h3("Description"),
+                             value = "")),
+            column(4,
+                   br(),
+                   br(),
+                   textInput("height_cm", h3("Height (cm)"),
+                             value = "")),
+            column(4,
+                   br(),
+                   br(),
+                   textInput("length_cm", h3("Length (cm)"),
+                             value = "")),
+            column(4,
+                   br(),
+                   br(),
+                   textInput("width_cm", h3("Width (cm)"),
+                             value = "")),
+            column(4,
+                   br(),
+                   br(),
+                   textInput("lowEstimate", h3("Low estimate"),
+                             value = "")),
+            column(4,
+                   br(),
+                   br(),
+                   textInput("highEstimate", h3("High estimate"),
+                             value = "")),
+            column(4,
+                   br(),
+                   br(),
+                   textInput("added", h3("Added"),
+                             value = "")),
+            
+            column(
+                12,
+                h3("New piece"),
+                actionButton("addPiece", "Add piece"),
+                helpText("Click to insert the data")
+            )
+        )
+        
+    )
+    )
+    )
+        
+    
+    )
+
 
 # Server: The server function contains the instructions to build the app
 server <- function(input, output, session) {
@@ -78,6 +157,34 @@ server <- function(input, output, session) {
         updateTextInput(session, "surname", value = "")
         updateTextInput(session, "address", value = "")
     })
+    magazzino$load("pezzi.csv")
+    data_p <- magazzino$getCsvContent()
+    output$tabellaPezzi <- DT::renderDataTable(data_p)
+    observeEvent(input$addPiece, {
+        nuovoPezzo = Pezzo$new(v_ID = as.integer(input$venditore_ID),
+                               n = input$name,
+                               d = input$description,
+                               h_cm = as.integer(input$height_cm),
+                               l_cm = as.integer(input$length_cm),
+                               w_cm = as.integer(input$width_cm),
+                               low_e = as.integer(input$lowEstimate),
+                               high_e = as.integer(input$highEstimate),
+                               a = input$added)
+        
+        magazzino$addPezzo(nuovoPezzo)
+        magazzino$save("pezzi.csv")
+        data_p <- magazzino$getCsvContent()
+        output$tabellaPezzi <- DT::renderDataTable(data_p)
+        updateTextInput(session, "venditore_ID", value = "")
+        updateTextInput(session, "name", value = "")
+        updateTextInput(session, "description", value = "")
+        updateTextInput(session, "height_cm", value = "")
+        updateTextInput(session, "length_cm", value = "")
+        updateTextInput(session, "width_cm", value = "")
+        updateTextInput(session, "lowEstimate", value = "")
+        updateTextInput(session, "highEstimate", value = "")
+        updateTextInput(session, "added", value = "")
+    }) 
     
 }
 
