@@ -10,6 +10,8 @@ rm(list = ls())
 setwd("~/Documents/GitHub/gestione_aste")
 source("~/Documents/GitHub/gestione_aste/Venditore.R")
 source("~/Documents/GitHub/gestione_aste/Anagrafica.R")
+source("~/Documents/GitHub/gestione_aste/Pezzo.R")
+source("~/Documents/GitHub/gestione_aste/Magazzino.R")
 library(shiny)
 library(DT)
 
@@ -39,17 +41,17 @@ ui <- fluidPage(# Application title
                 column(4,
                        br(),
                        br(),
-                       textInput("name", h3("Name"),
+                       textInput("v_name", h3("Name"),
                                  value = "")),
                 column(4,
                        br(),
                        br(),
-                       textInput("surname", h3("Surname"),
+                       textInput("v_surname", h3("Surname"),
                                  value = "")),
                 column(4,
                        br(),
                        br(),
-                       textInput("address", h3("Address"),
+                       textInput("v_address", h3("Address"),
                                  value = "")),
                 column(
                     12,
@@ -85,7 +87,7 @@ ui <- fluidPage(# Application title
             column(4,
                    br(),
                    br(),
-                   textInput("name", h3("Name"),
+                   textInput("p_name", h3("Name"),
                              value = "")),
             column(4,
                    br(),
@@ -95,32 +97,32 @@ ui <- fluidPage(# Application title
             column(4,
                    br(),
                    br(),
-                   textInput("height_cm", h3("Height (cm)"),
-                             value = "")),
+                   numericInput("height_cm", h3("Height (cm)"),
+                             value = 0)),
             column(4,
                    br(),
                    br(),
-                   textInput("length_cm", h3("Length (cm)"),
-                             value = "")),
+                   numericInput("length_cm", h3("Length (cm)"),
+                             value = 0)),
             column(4,
                    br(),
                    br(),
-                   textInput("width_cm", h3("Width (cm)"),
-                             value = "")),
+                   numericInput("width_cm", h3("Width (cm)"),
+                             value = 0)),
             column(4,
                    br(),
                    br(),
-                   textInput("lowEstimate", h3("Low estimate"),
-                             value = "")),
+                   numericInput("p_lowEstimate", h3("Low estimate"),
+                             value = 0)),
             column(4,
                    br(),
                    br(),
-                   textInput("highEstimate", h3("High estimate"),
-                             value = "")),
+                   numericInput("p_highEstimate", h3("High estimate"),
+                             value = 0)),
             column(4,
                    br(),
                    br(),
-                   textInput("added", h3("Added"),
+                   dateInput("p_added", h3("Added"),
                              value = "")),
             
             column(
@@ -145,45 +147,46 @@ server <- function(input, output, session) {
     data <- anagrafica$getCsvContent()
     output$tabellaVenditori <- DT::renderDataTable(data)
     observeEvent(input$addVendor, {
-        nuovoVenditore = Venditore$new(n = input$name,
-                                       s = input$surname,
-                                       a = input$address)
+        nuovoVenditore = Venditore$new(v_n = input$v_name,
+                                       v_s = input$v_surname,
+                                       v_a = input$v_address)
         
         anagrafica$addVenditore(nuovoVenditore)
         anagrafica$save("prova.csv")
         data <- anagrafica$getCsvContent()
         output$tabellaVenditori <- DT::renderDataTable(data)
-        updateTextInput(session, "name", value = "")
-        updateTextInput(session, "surname", value = "")
-        updateTextInput(session, "address", value = "")
+        updateTextInput(session, "v_name", value = "")
+        updateTextInput(session, "v_surname", value = "")
+        updateTextInput(session, "v_address", value = "")
     })
     magazzino$load("pezzi.csv")
     data_p <- magazzino$getCsvContent()
     output$tabellaPezzi <- DT::renderDataTable(data_p)
     observeEvent(input$addPiece, {
-        nuovoPezzo = Pezzo$new(v_ID = as.integer(input$venditore_ID),
-                               n = input$name,
+        print(input$venditore_ID)
+        nuovoPezzo = Pezzo$new(v_ID = input$venditore_ID,
+                               p_n = input$p_name,
                                d = input$description,
                                h_cm = as.integer(input$height_cm),
                                l_cm = as.integer(input$length_cm),
                                w_cm = as.integer(input$width_cm),
-                               low_e = as.integer(input$lowEstimate),
-                               high_e = as.integer(input$highEstimate),
-                               a = input$added)
+                               p_low_e = as.integer(input$p_lowEstimate),
+                               p_high_e = as.integer(input$p_highEstimate),
+                               p_a = as.character(input$p_added))
         
         magazzino$addPezzo(nuovoPezzo)
         magazzino$save("pezzi.csv")
         data_p <- magazzino$getCsvContent()
         output$tabellaPezzi <- DT::renderDataTable(data_p)
         updateTextInput(session, "venditore_ID", value = "")
-        updateTextInput(session, "name", value = "")
+        updateTextInput(session, "p_name", value = "")
         updateTextInput(session, "description", value = "")
-        updateTextInput(session, "height_cm", value = "")
-        updateTextInput(session, "length_cm", value = "")
-        updateTextInput(session, "width_cm", value = "")
-        updateTextInput(session, "lowEstimate", value = "")
-        updateTextInput(session, "highEstimate", value = "")
-        updateTextInput(session, "added", value = "")
+        updateNumericInput(session, "height_cm", value = 0)
+        updateNumericInput(session, "length_cm", value = 0)
+        updateNumericInput(session, "width_cm", value = 0)
+        updateNumericInput(session, "p_lowEstimate", value = 0)
+        updateNumericInput(session, "p_highEstimate", value = 0)
+        updateDateInput(session, "p_added", value = NULL)
     }) 
     
 }

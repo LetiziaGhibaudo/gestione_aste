@@ -54,13 +54,13 @@ Magazzino <- setRefClass(
 
 
 
-magazzino = Magazzino$new()
-magazzino$load("pezzi.csv")
-magazzino$getCsvContent()
+#magazzino = Magazzino$new()
+#magazzino$load("pezzi.csv")
+#magazzino$getCsvContent()
 
-nuovoPezzo = Pezzo$new(v_ID = 210723, n = "Bruno Gambone (1936-2021) Set of two bottles - Limited edition", d = "Stoneware Signed 'Gambone Italy' Creation date: circa 1985-1987", h_cm = 30, l_cm = 13.5, w_cm = 13, low_e = 2500, high_e = 3500, a = "16/02/2023")
-magazzino$addPezzo(nuovoPezzo)
-magazzino$save("pezzi.csv")
+#nuovoPezzo = Pezzo$new(v_ID = 210723, n = "Bruno Gambone (1936-2021) Set of two bottles - Limited edition", d = "Stoneware Signed 'Gambone Italy' Creation date: circa 1985-1987", h_cm = 30, l_cm = 13.5, w_cm = 13, low_e = 2500, high_e = 3500, a = "16/02/2023")
+#magazzino$addPezzo(nuovoPezzo)
+#magazzino$save("pezzi.csv")
 
 
 
