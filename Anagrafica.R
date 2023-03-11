@@ -42,6 +42,16 @@ Anagrafica <- setRefClass(
         c("ID", "name", "surname", "address")
       return(data)
     },
+    getSelectBoxContent = function() {
+      v_list <- list()
+      for (venditore_attuale in vendors) {
+      label <- paste(venditore_attuale$v_name, venditore_attuale$v_surname, venditore_attuale$h_ID, sep = "-")  
+      v_list[[label]] <- venditore_attuale$h_ID
+      print(label)
+      }
+      return(v_list)
+      },
+      
     addVenditore = function(venditore) {
       # the function creates a new seller 
       vendors <<- c(vendors, venditore)
@@ -57,4 +67,8 @@ Anagrafica <- setRefClass(
     }
   )
 )
+
+anagrafica = Anagrafica$new()
+anagrafica$load("prova.csv")
+anagrafica$getSelectBoxContent()
 

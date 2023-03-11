@@ -17,7 +17,8 @@ library(DT)
 
 anagrafica <- Anagrafica$new()
 magazzino <- Magazzino$new()
-
+select <- anagrafica$getSelectBoxContent()
+#print(select)
 # UI: The user interface object controls the layout and appearance of the app 
 ui <- fluidPage(# Application title
     titlePanel("ARTEχNE - auction house solution"),
@@ -82,8 +83,16 @@ ui <- fluidPage(# Application title
             column(4,
                    br(),
                    br(),
-                   textInput("venditore_ID", h3("Vendor ID"),
-                             value = "")),
+                   selectInput("venditore_ID", label = h3("Select vendor"), 
+                               select 
+                               ),
+                   
+                    # hr(),
+                    # fluidRow(column(3, verbatimTextOutput("selected")))
+                    
+            ),
+            # ("venditore_ID", h3("Vendor ID"),
+            #                  value = "")),
             column(4,
                    br(),
                    br(),
@@ -161,10 +170,13 @@ server <- function(input, output, session) {
     })
     magazzino$load("pezzi.csv")
     data_p <- magazzino$getCsvContent()
+    select <- anagrafica$getSelectBoxContent()
     output$tabellaPezzi <- DT::renderDataTable(data_p)
     observeEvent(input$addPiece, {
         print(input$venditore_ID)
-        nuovoPezzo = Pezzo$new(v_ID = input$venditore_ID,
+        nuovoPezzo = Pezzo$new(v_ID = observeEvent(input$venditore_ID, {input$venditore_ID}),
+                               v_ID = input$venditore_ID,
+                               
                                p_n = input$p_name,
                                d = input$description,
                                h_cm = as.integer(input$height_cm),
@@ -178,7 +190,7 @@ server <- function(input, output, session) {
         magazzino$save("pezzi.csv")
         data_p <- magazzino$getCsvContent()
         output$tabellaPezzi <- DT::renderDataTable(data_p)
-        updateTextInput(session, "venditore_ID", value = "")
+        updateSelectInput(session, "venditore_ID", value = "")
         updateTextInput(session, "p_name", value = "")
         updateTextInput(session, "description", value = "")
         updateNumericInput(session, "height_cm", value = 0)
@@ -192,5 +204,7 @@ server <- function(input, output, session) {
 }
 
 # Run the application
+if(interactive()) {
 shinyApp(ui = ui, server = server)
+}
 

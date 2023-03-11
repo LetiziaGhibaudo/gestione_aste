@@ -90,6 +90,7 @@ Aste <- setRefClass(
   )
 )
 
+
 asta = Asta$new()
 asta$loadAuctions("aste.csv")
 asta$getCsvContent()
