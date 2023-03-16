@@ -17,7 +17,7 @@ library(DT)
 
 anagrafica <- Anagrafica$new()
 magazzino <- Magazzino$new()
-select <- anagrafica$getSelectBoxContent()
+select_venditore_ID <- anagrafica$getSelectBoxContent()
 #print(select)
 # UI: The user interface object controls the layout and appearance of the app 
 ui <- fluidPage(# Application title
@@ -84,7 +84,7 @@ ui <- fluidPage(# Application title
                    br(),
                    br(),
                    selectInput("venditore_ID", label = h3("Select vendor"), 
-                               select 
+                               select_venditore_ID
                                ),
                    
                     # hr(),
@@ -164,17 +164,20 @@ server <- function(input, output, session) {
         anagrafica$save("prova.csv")
         data <- anagrafica$getCsvContent()
         output$tabellaVenditori <- DT::renderDataTable(data)
+        select_venditore_ID <- anagrafica$getSelectBoxContent()
+        updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
         updateTextInput(session, "v_name", value = "")
         updateTextInput(session, "v_surname", value = "")
         updateTextInput(session, "v_address", value = "")
     })
     magazzino$load("pezzi.csv")
     data_p <- magazzino$getCsvContent()
-    select <- anagrafica$getSelectBoxContent()
+    select_venditore_ID <- anagrafica$getSelectBoxContent()
+    updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
     output$tabellaPezzi <- DT::renderDataTable(data_p)
     observeEvent(input$addPiece, {
         print(input$venditore_ID)
-        nuovoPezzo = Pezzo$new(v_ID = observeEvent(input$venditore_ID, {input$venditore_ID}),
+        nuovoPezzo = Pezzo$new(
                                v_ID = input$venditore_ID,
                                
                                p_n = input$p_name,
@@ -190,7 +193,7 @@ server <- function(input, output, session) {
         magazzino$save("pezzi.csv")
         data_p <- magazzino$getCsvContent()
         output$tabellaPezzi <- DT::renderDataTable(data_p)
-        updateSelectInput(session, "venditore_ID", value = "")
+        updateSelectInput(session, "venditore_ID", selected = NULL)
         updateTextInput(session, "p_name", value = "")
         updateTextInput(session, "description", value = "")
         updateNumericInput(session, "height_cm", value = 0)

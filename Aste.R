@@ -20,7 +20,6 @@ Aste <- setRefClass(
       lines = readLines(myfile)
       entries = length(lines)
       lots <<- list()
-      
       for (i in 1:entries) {
         lotto = Lotto$new()
         if((lotto$unserialize(lines[i])) && (lotto$a_ID == asta$h_ID) == TRUE) {

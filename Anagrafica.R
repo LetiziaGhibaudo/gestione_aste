@@ -68,7 +68,4 @@ Anagrafica <- setRefClass(
   )
 )
 
-anagrafica = Anagrafica$new()
-anagrafica$load("prova.csv")
-anagrafica$getSelectBoxContent()
 
