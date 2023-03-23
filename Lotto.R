@@ -21,22 +21,22 @@ Lotto <- setRefClass(
       l_prezzoMartello <<- l_pM
     },
     serialize = function() {
-      return(paste(p_ID, l_ID, a_ID, l_pI, l_pM, sep = ","))
+      return(paste(pezzo_ID, lotto_ID, asta_ID, l_prezzoIniziale, l_prezzoMartello, sep = ","))
     },
     getCsvContent = function() {
-      return(c(p_ID, l_ID, a_ID, l_pI, l_pM))
+      return(c(pezzo_ID, lotto_ID, asta_ID, l_prezzoIniziale, l_prezzoMartello))
     },
     unserialize = function(line) {
       list = strsplit(line, ",")
       print(length(unlist(list)))
       if (length(unlist(list)) > 3) {
-      pezzo_ID <<- unlist(list)[1]
-      lotto_ID <<- unlist(list)[2]
-      asta_ID <<- unlist(list)[3]
-      l_prezzoIniziale <<- as.integer(unlist(list)[4])
-      if (length(unlist(list)) > 4) {
-        l_prezzoMartello <<- as.integer(unlist(list)[5])
-      }
+        pezzo_ID <<- unlist(list)[1]
+        lotto_ID <<- unlist(list)[2]
+        asta_ID <<- unlist(list)[3]
+        l_prezzoIniziale <<- as.integer(unlist(list)[4])
+        if (length(unlist(list)) > 4) {
+          l_prezzoMartello <<- as.integer(unlist(list)[5])
+        }
       }
     }
   )
