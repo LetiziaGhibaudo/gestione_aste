@@ -1,3 +1,4 @@
+source("~/Documents/GitHub/gestione_aste/Lotto.R")
 Asta <- setRefClass(
   "Asta",
   fields = list(
@@ -20,16 +21,27 @@ Asta <- setRefClass(
       contatore <<- 1
     },
     serialize = function() {
-      return(paste(h_ID, dataInizio, dataFine, lotti, contatore, sep = ","),
-             if((lotto$l_ID) == "") {
-               contatore <<- contatore + 0
-             } else {
-               contatore <<- contatore + 1
-             }
-             )
+      return(paste(h_ID, dataInizio, dataFine, lotti, contatore, sep = ","))
+    },
+    getElementsContentLotti = function() {
+      data <- c()
+      for (lotto_attuale in lotti) {
+        data <- c(lotto_attuale$serialize(), data)
+      }
+      return(data)
     },
     getCsvContent = function() {
-      return(c(h_ID, dataInizio, dataFine, lotti, contatore))
+      return(c(h_ID, dataInizio, dataFine, contatore))
+    },
+    getCsvContentLotti = function() {
+      i = 1
+      data <- matrix(0, length(lotti), 5)
+      for(lotto in lotti) {
+        x <- lotto$getCsvContent()
+        data[i,] <- x
+        i = i + 1
+      }
+      return(data)
     },
     unserialize = function(line, file_name) {
       list = strsplit(line, ",")
@@ -39,7 +51,7 @@ Asta <- setRefClass(
         dataInizio <<- unlist(list)[2]
         dataFine <<- unlist(list)[3]
         if (length(unlist(list)) > 3) {
-          contatore <<- unlist(list)[4]
+          contatore <<- as.integer(unlist(list)[4])
         }
         loadLots(file_name)
       }
@@ -70,4 +82,6 @@ Asta <- setRefClass(
 lotto = Lotto$new()
 asta = Asta$new()
 asta$loadLots("lotti.csv")
+asta$getCsvContentLotti()
+
 
