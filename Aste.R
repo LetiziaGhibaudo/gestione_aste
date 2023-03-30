@@ -22,55 +22,61 @@ Aste <- setRefClass(
     },
     
     getElementsContentAste = function() {
-      data <- c()
+      data_aste <- c()
       for (asta_attuale in auctions) {
-        data <- c(asta_attuale$serialize(), data)
+        data_aste <- c(asta_attuale$serialize(), data_aste)
       }
-      return(data)
+      return(data_aste)
     },
     getElementsContentLotti = function() {
-      data <- c()
+      data_lotti <- c()
       for (asta_attuale in auctions) {
-        data <- c(asta_attuale$getElementsContentLotti(), data)
+        data_lotti <- c(asta_attuale$getElementsContentLotti(), data_lotti)
       }
-      return(data)
+      return(data_lotti)
     },
     getCsvContentAste = function() {
       i = 1
-      data <- matrix(0, length(auctions), 4)
+      data_aste <- matrix(0, length(auctions), 4)
       for (asta_attuale in auctions) {
         x <- asta_attuale$getCsvContent()
-        data[i,] <- x
+        data_aste[i,] <- x
         i = i + 1
       }
-      data = data.frame(data)
-      colnames(data) <-
+      data_aste = data.frame(data_aste)
+      colnames(data_aste) <-
         c("auction ID", "start time", "end time", "contatore")
-      return(data)
+      return(data_aste)
     },
     getCsvContentLotti = function() {
-      data <- matrix(0, 0, 5)
+      data_lotti <- matrix(0, 0, 5)
       for (asta_attuale in auctions) {
         x <- asta_attuale$getCsvContentLotti()
-        data <- rbind(data, x)
+        data_lotti <- rbind(data_lotti, x)
       }
-      data = data.frame(data)
-      colnames(data) <-
+      data_lotti = data.frame(data_lotti)
+      colnames(data_lotti) <-
         c("piece ID", "lot ID", "auction ID", "start price", "hammer price")
-      return(data)
+      return(data_lotti)
     },
     addLot = function(lotto) {
-           lots <<- c(lots, lotto)
+           lots <<- c(lots, lotto, contatore)
          },
     addAuction = function(asta) {
            auctions <<- c(auctions, asta)
+           if((asta$h_ID) == (lotto$asta_ID)) {
+             asta$contatore <<- asta$contatore + 1
+           }
+           addLot()
+           
          },
     save = function(file_name_aste, file_name_lotti) {
       path <- getwd()
       print(paste("save", path))
       myfile_aste = file(paste(path, "/", file_name_aste, sep = ""), open = "w+")
+      if (length(data) > 0) {
       writeLines(getElementsContentAste(), myfile_aste)
-      close(myfile_aste)
+      close(myfile_aste)}
       myfile_lotti = file(paste(path, "/", file_name_lotti, sep = ""), open = "w+")
       writeLines(getElementsContentLotti(), myfile_lotti)
       close(myfile_lotti)
@@ -81,7 +87,27 @@ Aste <- setRefClass(
 
 aste = Aste$new()
 aste$loadAuctions("aste.csv", "lotti.csv")
+aste$auctions
 
+aste$getCsvContentLotti()
+aste$getElementsContentLotti()
+aste$getCsvContentAste()
+aste$getElementsContentAste()
 
-aste$getCsvContent()
+nuovaAsta = Asta$new(dataI= "30-03-2023", dataF = "31-03-2023")
+aste$addAuction(nuovaAsta)
+
+nuovoLotto = Lotto$new (p_ID = "P390249",
+                        l_ID = "1",
+                        a_ID = "A940015",
+                        l_pI = 100,
+                        l_pM = 1000)
+aste$addLot(nuovoLotto)
+nuovoLotto2 = Lotto$new (p_ID = "P943254",
+                        l_ID = "2",
+                        a_ID = "A940015",
+                        l_pI = 200,
+                        l_pM = 300)
+aste$addLot(nuovoLotto2)
+
 aste$save("aste2.csv", "lotti2.csv")

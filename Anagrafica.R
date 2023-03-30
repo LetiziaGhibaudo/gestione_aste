@@ -1,5 +1,6 @@
 # The class Anagrafica is responsible for loading and saving the vendors list;
 # Furthermore, we can add a new seller and they will be saved in the csv file as a new row
+source("~/Documents/GitHub/gestione_aste/Venditore.R")
 Anagrafica <- setRefClass(
   "Anagrafica",
   fields = list(vendors = "list"),

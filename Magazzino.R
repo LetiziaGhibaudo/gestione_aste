@@ -1,3 +1,4 @@
+source("~/Documents/GitHub/gestione_aste/Pezzo.R")
 Magazzino <- setRefClass(
   "Magazzino",
   fields = list(pieces = "list"),

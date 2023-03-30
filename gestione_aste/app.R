@@ -8,9 +8,7 @@
 #
 rm(list = ls())
 setwd("~/Documents/GitHub/gestione_aste")
-source("~/Documents/GitHub/gestione_aste/Venditore.R")
 source("~/Documents/GitHub/gestione_aste/Anagrafica.R")
-source("~/Documents/GitHub/gestione_aste/Pezzo.R")
 source("~/Documents/GitHub/gestione_aste/Magazzino.R")
 library(shiny)
 library(DT)

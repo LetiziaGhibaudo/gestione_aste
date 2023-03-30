@@ -35,13 +35,13 @@ Asta <- setRefClass(
     },
     getCsvContentLotti = function() {
       i = 1
-      data <- matrix(0, length(lotti), 5)
-      for(lotto in lotti) {
-        x <- lotto$getCsvContent()
-        data[i,] <- x
+      data_lotti <- matrix(0, length(lotti), 5)
+      for(lotto_attuale in lotti) {
+        x <- lotto_attuale$getCsvContent()
+        data_lotti[i,] <- x
         i = i + 1
       }
-      return(data)
+      return(data_lotti)
     },
     unserialize = function(line, file_name) {
       list = strsplit(line, ",")
