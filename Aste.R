@@ -2,7 +2,6 @@ source("~/Documents/GitHub/gestione_aste/Asta.R")
 Aste <- setRefClass(
   "Aste",
   fields = list(
-    lots = "list",
     auctions = "list"
   ),
   methods = list(
@@ -37,7 +36,7 @@ Aste <- setRefClass(
     },
     getCsvContentAste = function() {
       i = 1
-      data_aste <- matrix(0, length(auctions), 4)
+      data_aste <- matrix(0, length(auctions), 3)
       for (asta_attuale in auctions) {
         x <- asta_attuale$getCsvContent()
         data_aste[i,] <- x
@@ -45,49 +44,51 @@ Aste <- setRefClass(
       }
       data_aste = data.frame(data_aste)
       colnames(data_aste) <-
-        c("auction ID", "start time", "end time", "contatore")
+        c("auction ID", "start time", "end time")
       return(data_aste)
     },
     getCsvContentLotti = function() {
-      data_lotti <- matrix(0, 0, 5)
+      data_lotti <- matrix(0, 0, 4)
       for (asta_attuale in auctions) {
         x <- asta_attuale$getCsvContentLotti()
         data_lotti <- rbind(data_lotti, x)
       }
       data_lotti = data.frame(data_lotti)
       colnames(data_lotti) <-
-        c("piece ID", "lot ID", "auction ID", "start price", "hammer price")
+        c("piece ID", "lot ID", "start price", "hammer price")
       return(data_lotti)
     },
     addLot = function(lotto) {
-           lots <<- c(lots, lotto, contatore)
-         },
+      for (asta_attuale in auctions) {
+        if (asta_attuale$h_ID == lotto$asta_ID) {
+          asta_attuale$addLotto(lotto)
+        }
+      }
+    },
     addAuction = function(asta) {
-           auctions <<- c(auctions, asta)
-           if((asta$h_ID) == (lotto$asta_ID)) {
-             asta$contatore <<- asta$contatore + 1
-           }
-           addLot()
-           
-         },
+      auctions <<- c(auctions, asta)
+    },
     save = function(file_name_aste, file_name_lotti) {
       path <- getwd()
       print(paste("save", path))
-      myfile_aste = file(paste(path, "/", file_name_aste, sep = ""), open = "w+")
-      if (length(data) > 0) {
-      writeLines(getElementsContentAste(), myfile_aste)
-      close(myfile_aste)}
-      myfile_lotti = file(paste(path, "/", file_name_lotti, sep = ""), open = "w+")
-      writeLines(getElementsContentLotti(), myfile_lotti)
-      close(myfile_lotti)
+      if (length(getElementsContentAste()) > 0) {
+        myfile_aste = file(paste(path, "/", file_name_aste, sep = ""), open = "w+")
+        writeLines(getElementsContentAste(), myfile_aste)
+        close(myfile_aste)
+      }
+      if (length(getElementsContentLotti()) > 0) {
+        myfile_lotti = file(paste(path, "/", file_name_lotti, sep = ""), open = "w+")
+        writeLines(getElementsContentLotti(), myfile_lotti)
+        close(myfile_lotti)
+      }
     }
   )
 )
 
-
+setwd("~/Documents/GitHub/gestione_aste")
 aste = Aste$new()
 aste$loadAuctions("aste.csv", "lotti.csv")
-aste$auctions
+#aste$auctions
 
 aste$getCsvContentLotti()
 aste$getElementsContentLotti()
@@ -99,13 +100,13 @@ aste$addAuction(nuovaAsta)
 
 nuovoLotto = Lotto$new (p_ID = "P390249",
                         l_ID = "1",
-                        a_ID = "A940015",
+                        a_ID = nuovaAsta$h_ID,
                         l_pI = 100,
                         l_pM = 1000)
 aste$addLot(nuovoLotto)
 nuovoLotto2 = Lotto$new (p_ID = "P943254",
                         l_ID = "2",
-                        a_ID = "A940015",
+                        a_ID = nuovaAsta$h_ID,
                         l_pI = 200,
                         l_pM = 300)
 aste$addLot(nuovoLotto2)

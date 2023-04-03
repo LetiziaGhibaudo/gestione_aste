@@ -10,11 +10,14 @@ rm(list = ls())
 setwd("~/Documents/GitHub/gestione_aste")
 source("~/Documents/GitHub/gestione_aste/Anagrafica.R")
 source("~/Documents/GitHub/gestione_aste/Magazzino.R")
+source("~/Documents/GitHub/gestione_aste/Aste.R")
 library(shiny)
 library(DT)
 
 anagrafica <- Anagrafica$new()
 magazzino <- Magazzino$new()
+aste <- Aste$new()
+asta <- Asta$new()
 select_venditore_ID <- anagrafica$getSelectBoxContent()
 #print(select)
 # UI: The user interface object controls the layout and appearance of the app 
@@ -140,12 +143,35 @@ ui <- fluidPage(# Application title
             )
         )
         
+    ),
+    tabPanel(
+        "Aste",
+        verbatimTextOutput("Aste"),
+        fluidRow(column(
+            6,
+            br(),
+            br(),
+            h2("Auctions"),
+            br(),
+            br(),
+            DT::dataTableOutput("tabellaAste")
+        ),
+        column(
+            6,
+            br(),
+            br(),
+            h2("Lots"),
+            br(),
+            br(),
+            DT::dataTableOutput("tabellaLotti")
+        ))
     )
     )
-    )
+    ))
+    
         
     
-    )
+    
 
 
 # Server: The server function contains the instructions to build the app
@@ -201,11 +227,20 @@ server <- function(input, output, session) {
         updateNumericInput(session, "p_highEstimate", value = 0)
         updateDateInput(session, "p_added", value = NULL)
     }) 
-    
+    aste$loadAuctions("aste.csv", "lotti.csv")
+    data_aste <- aste$getCsvContentAste()
+    output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single")
+   
+     
+    #asta$loadLots("lotti.csv")
+    data_lotti <- aste$getCsvContentLotti()
+    observeEvent(input$tabellaAste_rows_selected, {
+            output$tabellaLotti <- DT::renderDataTable(data_lotti)
+})
 }
 
 # Run the application
 if(interactive()) {
 shinyApp(ui = ui, server = server)
-}
+    }
 

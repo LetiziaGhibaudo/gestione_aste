@@ -21,7 +21,7 @@ Asta <- setRefClass(
       contatore <<- 1
     },
     serialize = function() {
-      return(paste(h_ID, dataInizio, dataFine, lotti, contatore, sep = ","))
+      return(paste(h_ID, dataInizio, dataFine, contatore, sep = ","))
     },
     getElementsContentLotti = function() {
       data <- c()
@@ -31,11 +31,11 @@ Asta <- setRefClass(
       return(data)
     },
     getCsvContent = function() {
-      return(c(h_ID, dataInizio, dataFine, contatore))
+      return(c(h_ID, dataInizio, dataFine))
     },
     getCsvContentLotti = function() {
       i = 1
-      data_lotti <- matrix(0, length(lotti), 5)
+      data_lotti <- matrix(0, length(lotti), 4)
       for(lotto_attuale in lotti) {
         x <- lotto_attuale$getCsvContent()
         data_lotti[i,] <- x
@@ -73,15 +73,20 @@ Asta <- setRefClass(
         } 
       }
       
+    },
+    addLotto = function(lotto) {
+      lotto$lotto_ID <- as.character(contatore)
+      contatore <<- contatore +1
+      lotti <<- c(lotti, lotto)
     }
     
   )
 )
 
 
-lotto = Lotto$new()
-asta = Asta$new()
-asta$loadLots("lotti.csv")
-asta$getCsvContentLotti()
+# lotto = Lotto$new()
+# asta = Asta$new()
+# asta$loadLots("lotti.csv")
+# asta$getCsvContentLotti()
 
 
