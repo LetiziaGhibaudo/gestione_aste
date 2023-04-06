@@ -164,7 +164,32 @@ ui <- fluidPage(# Application title
             br(),
             br(),
             DT::dataTableOutput("tabellaLotti")
-        ))
+        )),
+        br(),
+        br(),
+        br(),
+        h2("New auction"),
+        verbatimTextOutput("Add Auction"),
+        fluidRow(
+            column(3,
+                   br(),
+                   dateInput("dataInizio", h3("Start time"),
+                             value = "")),
+            column(3,
+                   br(),
+                   dateInput("dataFine", h3("End time"),
+                             value = "")),
+            br(),
+            br(),
+            br(),
+            column(
+                12,
+                h3("New auction"),
+                actionButton("addAuction", "Add auction"),
+                helpText("Click to insert the data")
+            ),
+            
+        )
     )
     )
     ))
@@ -230,6 +255,19 @@ server <- function(input, output, session) {
     aste$loadAuctions("aste.csv", "lotti.csv")
     data_aste <- aste$getCsvContentAste()
     output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single")
+    
+    observeEvent(input$addAuction, {
+        
+        nuovaAsta = Asta$new(dataI = as.character(input$dataInizio),
+                             dataF = as.character(input$dataFine))
+        
+        aste$addAuction(nuovaAsta)
+        aste$save("aste.csv", "lotti.csv")
+        data_aste <- aste$getCsvContentAste()
+        output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single")
+        updateDateInput(session, "dataInizio", value = NULL)
+        updateDateInput(session, "dataFine", value = NULL)
+    }) 
    
      
     #asta$loadLots("lotti.csv")
@@ -238,7 +276,6 @@ server <- function(input, output, session) {
         id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
         data_lotti_sub <- data_lotti[data_lotti$"auction ID"  %in% id_asta_selezionata, ]
         output$tabellaLotti <- DT::renderDataTable(data_lotti_sub)
-        
     })
 }
     
