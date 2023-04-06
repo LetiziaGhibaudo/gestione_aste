@@ -235,9 +235,13 @@ server <- function(input, output, session) {
     #asta$loadLots("lotti.csv")
     data_lotti <- aste$getCsvContentLotti()
     observeEvent(input$tabellaAste_rows_selected, {
-            output$tabellaLotti <- DT::renderDataTable(data_lotti)
-})
+        id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
+        data_lotti_sub <- data_lotti[data_lotti$"auction ID"  %in% id_asta_selezionata, ]
+        output$tabellaLotti <- DT::renderDataTable(data_lotti_sub)
+        
+    })
 }
+    
 
 # Run the application
 if(interactive()) {

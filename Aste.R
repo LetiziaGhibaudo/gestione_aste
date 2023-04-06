@@ -48,14 +48,14 @@ Aste <- setRefClass(
       return(data_aste)
     },
     getCsvContentLotti = function() {
-      data_lotti <- matrix(0, 0, 4)
+      data_lotti <- matrix(0, 0, 5)
       for (asta_attuale in auctions) {
         x <- asta_attuale$getCsvContentLotti()
         data_lotti <- rbind(data_lotti, x)
       }
       data_lotti = data.frame(data_lotti)
       colnames(data_lotti) <-
-        c("piece ID", "lot ID", "start price", "hammer price")
+        c("piece ID", "lot ID", "auction ID", "start price", "hammer price")
       return(data_lotti)
     },
     addLot = function(lotto) {

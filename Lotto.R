@@ -24,7 +24,7 @@ Lotto <- setRefClass(
       return(paste(pezzo_ID, lotto_ID, asta_ID, l_prezzoIniziale, l_prezzoMartello, sep = ","))
     },
     getCsvContent = function() {
-      return(c(pezzo_ID, lotto_ID, l_prezzoIniziale, l_prezzoMartello))
+      return(c(pezzo_ID, lotto_ID, asta_ID, l_prezzoIniziale, l_prezzoMartello))
     },
     unserialize = function(line) {
       list = strsplit(line, ",")
