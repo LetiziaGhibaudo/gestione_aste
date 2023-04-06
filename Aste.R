@@ -58,6 +58,15 @@ Aste <- setRefClass(
         c("piece ID", "lot ID", "auction ID", "start price", "hammer price")
       return(data_lotti)
     },
+    getSelectBoxContentAste = function() {
+      a_list <- list()
+      for (asta_attuale in auctions) {
+        a_label <- paste(asta_attuale$h_ID)  
+        a_list[[a_label]] <- asta_attuale$h_ID
+        print(a_label)
+      }
+      return(a_list)
+    },
     addLot = function(lotto) {
       for (asta_attuale in auctions) {
         if (asta_attuale$h_ID == lotto$asta_ID) {

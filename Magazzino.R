@@ -38,6 +38,15 @@ Magazzino <- setRefClass(
         c("ID", "vendor ID", "name", "description", "height (cm)", "length (cm)", "width (cm)", "low estimate", "high estimate", "added")
       return(data)
     },
+    getSelectBoxContentPezzo = function() {
+      p_list <- list()
+      for (pezzo_attuale in pieces) {
+        p_label <- paste(pezzo_attuale$p_name, pezzo_attuale$h_ID, sep = "-")  
+        p_list[[p_label]] <- pezzo_attuale$h_ID
+        print(p_label)
+      }
+      return(p_list)
+    },
     addPezzo = function(pezzo) {
       pieces <<- c(pieces, pezzo)
     },
