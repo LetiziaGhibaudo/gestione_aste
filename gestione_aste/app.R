@@ -13,6 +13,8 @@ source("~/Documents/GitHub/gestione_aste/Magazzino.R")
 source("~/Documents/GitHub/gestione_aste/Aste.R")
 library(shiny)
 library(DT)
+library(shinyvalidate)
+library(shinyalert)
 
 anagrafica <- Anagrafica$new()
 magazzino <- Magazzino$new()
@@ -28,7 +30,7 @@ ui <- fluidPage(# Application title
     
     mainPanel(tabsetPanel(
         tabPanel(
-            "Venditori",
+            "Vendors",
             verbatimTextOutput("Venditori"),
             fluidRow(column(
                 12,
@@ -45,21 +47,37 @@ ui <- fluidPage(# Application title
                 column(4,
                        br(),
                        br(),
-                       textInput("v_name", h3("Name"),
+                       textInput("v_name", h3("Name*"),
                                  value = "")),
                 column(4,
                        br(),
                        br(),
-                       textInput("v_surname", h3("Surname"),
+                       textInput("v_surname", h3("Surname*"),
                                  value = "")),
                 column(4,
                        br(),
                        br(),
                        textInput("v_address", h3("Address"),
                                  value = "")),
+                column(4,
+                       br(),
+                       br(),
+                       textInput("v_phone", h3("Phone number"),
+                                 value = "")),
+                column(4,
+                       br(),
+                       br(),
+                       textInput("v_mail", h3("E-mail address*"),
+                                 value = "")),
+                column(4,
+                       br(),
+                       br(),
+                       textInput("v_commission", h3("Commission (%)"),
+                                 value = "")),
                 column(
                     12,
                     h3("New vendor"),
+                    useShinyalert(), 
                     actionButton("addVendor", "Add vendor"),
                     helpText("Click to insert the data")
                 )
@@ -69,7 +87,7 @@ ui <- fluidPage(# Application title
         ,
         
         tabPanel(
-            "Pezzi",
+            "Pieces",
             verbatimTextOutput("Pezzi"),
             fluidRow(column(
                 12,
@@ -151,7 +169,7 @@ ui <- fluidPage(# Application title
             
         ),
         tabPanel(
-            "Aste",
+            "Auctions",
             verbatimTextOutput("Aste"),
             fluidRow(
                 column(
@@ -208,8 +226,7 @@ ui <- fluidPage(# Application title
                        )),
             ),
             fluidRow(
-                column(3),
-                column(3),
+                column(6),
                 column(3,
                        br(),
                        numericInput("l_prezzoIniziale", h4("Start price"),
@@ -240,12 +257,32 @@ server <- function(input, output, session) {
     anagrafica$load("prova.csv")
     data <- anagrafica$getCsvContent()
     output$tabellaVenditori <- DT::renderDataTable(data)
+    v_iv <- InputValidator$new()
+    v_iv$add_rule("v_name", sv_required())
+    v_iv$add_rule("v_surname", sv_required())
+    v_iv$add_rule("v_mail", sv_required())
+    v_iv$add_rule("v_mail", sv_email())
+    
     observeEvent(input$addVendor, {
-        nuovoVenditore = Venditore$new(v_n = input$v_name,
-                                       v_s = input$v_surname,
-                                       v_a = input$v_address)
-        
-        anagrafica$addVenditore(nuovoVenditore)
+        if (v_iv$is_valid()) {
+            nuovoVenditore = Venditore$new(v_n = input$v_name,
+                                           v_s = input$v_surname,
+                                           v_a = input$v_address,
+                                           v_ph = input$v_phone,
+                                           v_mail = input$v_mail,
+                                           v_comm = input$v_commission)
+            v_iv$enable()
+            anagrafica$addVenditore(nuovoVenditore)
+        } else {#showNotification(
+        #         "Please fix the errors before continuing",
+        #         duration = 10,
+        #         closeButton = TRUE,
+        #         type = "error",
+        #         session = getDefaultReactiveDomain()
+        #     )
+            shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
+        }
+        #anagrafica$addVenditore(nuovoVenditore)
         anagrafica$save("prova.csv")
         data <- anagrafica$getCsvContent()
         output$tabellaVenditori <- DT::renderDataTable(data)
@@ -254,7 +291,16 @@ server <- function(input, output, session) {
         updateTextInput(session, "v_name", value = "")
         updateTextInput(session, "v_surname", value = "")
         updateTextInput(session, "v_address", value = "")
+        updateTextInput(session, "v_phone", value = "")
+        updateTextInput(session, "v_mail", value = "")
+        updateTextInput(session, "v_commission", value = "")
     })
+    
+    
+        
+    
+    
+    
     magazzino$load("pezzi.csv")
     data_p <- magazzino$getCsvContent()
     select_venditore_ID <- anagrafica$getSelectBoxContent()
@@ -332,7 +378,8 @@ server <- function(input, output, session) {
         
         aste$addLot(nuovoLotto)
         aste$save("aste.csv", "lotti.csv")
-        # da fare aggiornare tabella con lotti nuovi
+        data_lotti <- aste$getCsvContentLotti()
+        output$tabellaLotti <- DT::renderDataTable(data_lotti)
         updateSelectInput(session, "pezzo_ID", selected = NULL)
         updateSelectInput(session, "pezzo_ID", selected = NULL)
         updateNumericInput(session, "l_prezzoIniziale", value = 0)

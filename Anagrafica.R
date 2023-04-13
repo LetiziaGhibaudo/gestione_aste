@@ -31,7 +31,7 @@ Anagrafica <- setRefClass(
     },
     getCsvContent = function() {
       i = 1
-      data <- matrix(0, length(vendors), 4)
+      data <- matrix(0, length(vendors), 7)
       # we create a matrix that will be filled with the vendors data
       for (venditore_attuale in vendors) {
         x <- venditore_attuale$getCsvContent()
@@ -40,7 +40,7 @@ Anagrafica <- setRefClass(
       }
       data = data.frame(data)
       colnames(data) <-
-        c("ID", "name", "surname", "address")
+        c("ID", "Name", "Surname", "Address", "Phone number", "E-mail address", "Commission")
       return(data)
     },
     getSelectBoxContent = function() {
