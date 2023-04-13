@@ -36,8 +36,9 @@ Pezzo <- setRefClass(
     serialize = function() {
       return(paste(h_ID, venditore_ID, p_name, description, height_cm, length_cm, width_cm, p_lowEstimate, p_highEstimate, p_added, sep = ","))
     },
-    getCsvContent = function() {
-      return(c(h_ID, venditore_ID, p_name, description, height_cm, length_cm, width_cm, p_lowEstimate, p_highEstimate, p_added))
+    getCsvContent = function(anagrafica) {
+      venditore_nome_cognome <- anagrafica$resolveID(venditore_ID)
+      return(c(h_ID, venditore_nome_cognome[1], venditore_nome_cognome[2], p_name, description, height_cm, length_cm, width_cm, p_lowEstimate, p_highEstimate, p_added))
     },
     unserialize = function(line) {
       list = strsplit(line, ",")

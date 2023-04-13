@@ -25,17 +25,17 @@ Magazzino <- setRefClass(
       }
       return(data)
     },
-    getCsvContent = function() {
+    getCsvContent = function(anagrafica) {
       i = 1
-      data <- matrix(0, length(pieces), 10)
+      data <- matrix(0, length(pieces), 11)
       for (pezzo_attuale in pieces) {
-        x <- pezzo_attuale$getCsvContent()
+        x <- pezzo_attuale$getCsvContent(anagrafica)
         data[i,] <- x
         i = i + 1
       }
       data = data.frame(data)
       colnames(data) <-
-        c("ID", "vendor ID", "name", "description", "height (cm)", "length (cm)", "width (cm)", "low estimate", "high estimate", "added")
+        c("ID", "vendor name", "vendor surname", "name", "description", "height (cm)", "length (cm)", "width (cm)", "low estimate", "high estimate", "added")
       return(data)
     },
     getSelectBoxContentPezzo = function() {

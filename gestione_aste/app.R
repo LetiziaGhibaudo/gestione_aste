@@ -58,7 +58,8 @@ ui <- fluidPage(# Application title
                        br(),
                        br(),
                        textInput("v_address", h3("Address"),
-                                 value = "")),
+                                 value = ""))),
+            fluidRow(
                 column(4,
                        br(),
                        br(),
@@ -72,8 +73,11 @@ ui <- fluidPage(# Application title
                 column(4,
                        br(),
                        br(),
-                       textInput("v_commission", h3("Commission (%)"),
-                                 value = "")),
+                       numericInput("v_commission", h3("Commission (%)"),
+                                 value = 0, 
+                                 min = 0,
+                                 max = 100))),
+            fluidRow(
                 column(
                     12,
                     h3("New vendor"),
@@ -83,8 +87,7 @@ ui <- fluidPage(# Application title
                 )
             )
             
-        )
-        ,
+        ),
         
         tabPanel(
             "Pieces",
@@ -256,7 +259,7 @@ ui <- fluidPage(# Application title
 server <- function(input, output, session) {
     anagrafica$load("prova.csv")
     data <- anagrafica$getCsvContent()
-    output$tabellaVenditori <- DT::renderDataTable(data)
+    output$tabellaVenditori <- DT::renderDataTable(data, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
     v_iv <- InputValidator$new()
     v_iv$add_rule("v_name", sv_required())
     v_iv$add_rule("v_surname", sv_required())
@@ -265,35 +268,35 @@ server <- function(input, output, session) {
     
     observeEvent(input$addVendor, {
         if (v_iv$is_valid()) {
+            if (anagrafica$verifyNameSurname(input$v_name, input$v_surname) == FALSE) {
             nuovoVenditore = Venditore$new(v_n = input$v_name,
                                            v_s = input$v_surname,
                                            v_a = input$v_address,
                                            v_ph = input$v_phone,
                                            v_mail = input$v_mail,
-                                           v_comm = input$v_commission)
-            v_iv$enable()
+                                           v_comm = as.character(input$v_commission))
+            
             anagrafica$addVenditore(nuovoVenditore)
-        } else {#showNotification(
-        #         "Please fix the errors before continuing",
-        #         duration = 10,
-        #         closeButton = TRUE,
-        #         type = "error",
-        #         session = getDefaultReactiveDomain()
-        #     )
+            anagrafica$save("prova.csv")
+            data <- anagrafica$getCsvContent()
+            output$tabellaVenditori <- DT::renderDataTable(data)
+            select_venditore_ID <- anagrafica$getSelectBoxContent()
+            v_iv$disable()
+            updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
+            updateTextInput(session, "v_name", value = "")
+            updateTextInput(session, "v_surname", value = "")
+            updateTextInput(session, "v_address", value = "")
+            updateTextInput(session, "v_phone", value = "")
+            updateTextInput(session, "v_mail", value = "")
+            updateNumericInput(session, "v_commission", value = 0)
+        } else {
+            shinyalert("Oops!", "The user already exists", type = "error")
+            }
+    } else {
             shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
-        }
-        #anagrafica$addVenditore(nuovoVenditore)
-        anagrafica$save("prova.csv")
-        data <- anagrafica$getCsvContent()
-        output$tabellaVenditori <- DT::renderDataTable(data)
-        select_venditore_ID <- anagrafica$getSelectBoxContent()
-        updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
-        updateTextInput(session, "v_name", value = "")
-        updateTextInput(session, "v_surname", value = "")
-        updateTextInput(session, "v_address", value = "")
-        updateTextInput(session, "v_phone", value = "")
-        updateTextInput(session, "v_mail", value = "")
-        updateTextInput(session, "v_commission", value = "")
+            v_iv$enable() 
+            }
+        
     })
     
     
@@ -302,7 +305,7 @@ server <- function(input, output, session) {
     
     
     magazzino$load("pezzi.csv")
-    data_p <- magazzino$getCsvContent()
+    data_p <- magazzino$getCsvContent(anagrafica)
     select_venditore_ID <- anagrafica$getSelectBoxContent()
     updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
     output$tabellaPezzi <- DT::renderDataTable(data_p)

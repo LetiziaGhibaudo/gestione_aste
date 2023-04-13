@@ -65,6 +65,17 @@ Anagrafica <- setRefClass(
       print(getElementsContent())
       writeLines(getElementsContent(), myfile)
       close(myfile)
+    },
+    verifyNameSurname = function(name, surname) {
+      for (venditore_attuale in vendors) {
+        if (venditore_attuale$v_name == name && venditore_attuale$v_surname == surname) {
+          return(TRUE)
+        } 
+      } 
+      return(FALSE)
+    },
+    resolveID = function(ID) {
+      return(c("unknown","unknown"))
     }
   )
 )
