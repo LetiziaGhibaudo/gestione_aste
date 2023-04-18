@@ -75,7 +75,7 @@ Anagrafica <- setRefClass(
       return(FALSE)
     },
     resolveID = function(ID) {
-      return(c("unknown","unknown"))
+        return(c("v_name", "v_surname"))
     }
   )
 )

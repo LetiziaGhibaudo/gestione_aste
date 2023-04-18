@@ -94,30 +94,30 @@ Aste <- setRefClass(
   )
 )
 
-setwd("~/Documents/GitHub/gestione_aste")
-aste = Aste$new()
-aste$loadAuctions("aste.csv", "lotti.csv")
-#aste$auctions
-
-aste$getCsvContentLotti()
-aste$getElementsContentLotti()
-aste$getCsvContentAste()
-aste$getElementsContentAste()
-
-nuovaAsta = Asta$new(dataI= "30-03-2023", dataF = "31-03-2023")
-aste$addAuction(nuovaAsta)
-
-nuovoLotto = Lotto$new (p_ID = "P390249",
-                        l_ID = "1",
-                        a_ID = nuovaAsta$h_ID,
-                        l_pI = 100,
-                        l_pM = 1000)
-aste$addLot(nuovoLotto)
-nuovoLotto2 = Lotto$new (p_ID = "P943254",
-                        l_ID = "2",
-                        a_ID = nuovaAsta$h_ID,
-                        l_pI = 200,
-                        l_pM = 300)
-aste$addLot(nuovoLotto2)
-
-aste$save("aste2.csv", "lotti2.csv")
+# setwd("~/Documents/GitHub/gestione_aste")
+# aste = Aste$new()
+# aste$loadAuctions("aste.csv", "lotti.csv")
+# #aste$auctions
+# 
+# aste$getCsvContentLotti()
+# aste$getElementsContentLotti()
+# aste$getCsvContentAste()
+# aste$getElementsContentAste()
+# 
+# nuovaAsta = Asta$new(dataI= "30-03-2023", dataF = "31-03-2023")
+# aste$addAuction(nuovaAsta)
+# 
+# nuovoLotto = Lotto$new (p_ID = "P390249",
+#                         l_ID = "1",
+#                         a_ID = nuovaAsta$h_ID,
+#                         l_pI = 100,
+#                         l_pM = 1000)
+# aste$addLot(nuovoLotto)
+# nuovoLotto2 = Lotto$new (p_ID = "P943254",
+#                         l_ID = "2",
+#                         a_ID = nuovaAsta$h_ID,
+#                         l_pI = 200,
+#                         l_pM = 300)
+# aste$addLot(nuovoLotto2)
+# 
+# aste$save("aste2.csv", "lotti2.csv")

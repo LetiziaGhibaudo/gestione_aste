@@ -104,19 +104,11 @@ ui <- fluidPage(# Application title
             h2("New piece"),
             verbatimTextOutput("Add Piece"),
             fluidRow(
-                column(
-                    4,
-                    br(),
-                    br(),
-                    selectInput("venditore_ID", label = h3("Select vendor"),
-                                select_venditore_ID),
-                    
-                    # hr(),
-                    # fluidRow(column(3, verbatimTextOutput("selected")))
-                    
-                ),
-                # ("venditore_ID", h3("Vendor ID"),
-                #                  value = "")),
+                column(4,
+                       br(),
+                       br(),
+                       selectInput("venditore_ID", label = h3("Select vendor*"),
+                                    select_venditore_ID)),
                 column(4,
                        br(),
                        br(),
@@ -125,43 +117,45 @@ ui <- fluidPage(# Application title
                 column(4,
                        br(),
                        br(),
-                       textInput("description", h3("Description"),
-                                 value = "")),
+                       textInput("description", h3("Description*"),
+                                 value = ""))),
+            fluidRow(
                 column(4,
                        br(),
                        br(),
-                       numericInput("height_cm", h3("Height (cm)"),
+                       numericInput("height_cm", h3("Height (cm)*"),
                                     value = 0)),
                 column(4,
                        br(),
                        br(),
-                       numericInput("length_cm", h3("Length (cm)"),
+                       numericInput("length_cm", h3("Length (cm)*"),
                                     value = 0)),
                 column(4,
                        br(),
                        br(),
-                       numericInput("width_cm", h3("Width (cm)"),
-                                    value = 0)),
+                       numericInput("width_cm", h3("Width (cm)*"),
+                                    value = 0))),
+            fluidRow(
                 column(4,
                        br(),
                        br(),
                        numericInput(
-                           "p_lowEstimate", h3("Low estimate"),
+                           "p_lowEstimate", h3("Low estimate*"),
                            value = 0
                        )),
                 column(4,
                        br(),
                        br(),
                        numericInput(
-                           "p_highEstimate", h3("High estimate"),
+                           "p_highEstimate", h3("High estimate*"),
                            value = 0
                        )),
                 column(4,
                        br(),
                        br(),
-                       dateInput("p_added", h3("Added"),
-                                 value = "")),
-                
+                       dateInput("p_added", h3("Added*"),
+                                 value = ""))),
+            fluidRow(
                 column(
                     12,
                     h3("New piece"),
@@ -299,16 +293,12 @@ server <- function(input, output, session) {
         
     })
     
-    
-        
-    
-    
-    
+# Pieces 
     magazzino$load("pezzi.csv")
     data_p <- magazzino$getCsvContent(anagrafica)
     select_venditore_ID <- anagrafica$getSelectBoxContent()
     updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
-    output$tabellaPezzi <- DT::renderDataTable(data_p)
+    output$tabellaPezzi <- DT::renderDataTable(data_p, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
     observeEvent(input$addPiece, {
         print(input$venditore_ID)
         nuovoPezzo = Pezzo$new(
@@ -339,6 +329,17 @@ server <- function(input, output, session) {
         updateNumericInput(session, "p_highEstimate", value = 0)
         updateDateInput(session, "p_added", value = NULL)
     }) 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     aste$loadAuctions("aste.csv", "lotti.csv")
     data_aste <- aste$getCsvContentAste()
     output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single")
