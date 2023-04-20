@@ -112,7 +112,7 @@ ui <- fluidPage(# Application title
                 column(4,
                        br(),
                        br(),
-                       textInput("p_name", h3("Name"),
+                       textInput("p_name", h3("Name*"),
                                  value = "")),
                 column(4,
                        br(),
@@ -263,33 +263,33 @@ server <- function(input, output, session) {
     observeEvent(input$addVendor, {
         if (v_iv$is_valid()) {
             if (anagrafica$verifyNameSurname(input$v_name, input$v_surname) == FALSE) {
-            nuovoVenditore = Venditore$new(v_n = input$v_name,
-                                           v_s = input$v_surname,
-                                           v_a = input$v_address,
-                                           v_ph = input$v_phone,
-                                           v_mail = input$v_mail,
-                                           v_comm = as.character(input$v_commission))
-            
-            anagrafica$addVenditore(nuovoVenditore)
-            anagrafica$save("prova.csv")
-            data <- anagrafica$getCsvContent()
-            output$tabellaVenditori <- DT::renderDataTable(data)
-            select_venditore_ID <- anagrafica$getSelectBoxContent()
-            v_iv$disable()
-            updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
-            updateTextInput(session, "v_name", value = "")
-            updateTextInput(session, "v_surname", value = "")
-            updateTextInput(session, "v_address", value = "")
-            updateTextInput(session, "v_phone", value = "")
-            updateTextInput(session, "v_mail", value = "")
-            updateNumericInput(session, "v_commission", value = 0)
-        } else {
-            shinyalert("Oops!", "The user already exists", type = "error")
+                nuovoVenditore = Venditore$new(v_n = input$v_name,
+                                               v_s = input$v_surname,
+                                               v_a = input$v_address,
+                                               v_ph = input$v_phone,
+                                               v_mail = input$v_mail,
+                                               v_comm = as.character(input$v_commission))
+                
+                anagrafica$addVenditore(nuovoVenditore)
+                anagrafica$save("prova.csv")
+                data <- anagrafica$getCsvContent()
+                output$tabellaVenditori <- DT::renderDataTable(data)
+                select_venditore_ID <- anagrafica$getSelectBoxContent()
+                v_iv$disable()
+                updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
+                updateTextInput(session, "v_name", value = "")
+                updateTextInput(session, "v_surname", value = "")
+                updateTextInput(session, "v_address", value = "")
+                updateTextInput(session, "v_phone", value = "")
+                updateTextInput(session, "v_mail", value = "")
+                updateNumericInput(session, "v_commission", value = 0)
+            } else {
+                shinyalert("Oops!", "The user already exists", type = "error")
             }
-    } else {
+        } else {
             shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
             v_iv$enable() 
-            }
+        }
         
     })
     
@@ -299,47 +299,57 @@ server <- function(input, output, session) {
     select_venditore_ID <- anagrafica$getSelectBoxContent()
     updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
     output$tabellaPezzi <- DT::renderDataTable(data_p, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
+    p_iv <- InputValidator$new()
+    p_iv$add_rule("venditore_ID", sv_required())
+    p_iv$add_rule("p_name", sv_required())
+    p_iv$add_rule("description", sv_required())
+    p_iv$add_rule("height_cm", sv_required())
+    p_iv$add_rule("length_cm", sv_required())
+    p_iv$add_rule("width_cm", sv_required())
+    p_iv$add_rule("p_lowEstimate", sv_required())
+    p_iv$add_rule("p_highEstimate", sv_required())
+    p_iv$add_rule("p_added", sv_required())
+    
     observeEvent(input$addPiece, {
         print(input$venditore_ID)
-        nuovoPezzo = Pezzo$new(
-                               v_ID = input$venditore_ID,
-                               
-                               p_n = input$p_name,
-                               d = input$description,
-                               h_cm = as.integer(input$height_cm),
-                               l_cm = as.integer(input$length_cm),
-                               w_cm = as.integer(input$width_cm),
-                               p_low_e = as.integer(input$p_lowEstimate),
-                               p_high_e = as.integer(input$p_highEstimate),
-                               p_a = as.character(input$p_added))
-        
-        magazzino$addPezzo(nuovoPezzo)
-        magazzino$save("pezzi.csv")
-        data_p <- magazzino$getCsvContent()
-        output$tabellaPezzi <- DT::renderDataTable(data_p)
-        select_pezzo_ID <- magazzino$getSelectBoxContentPezzo()
-        updateSelectInput(session, "pezzo_ID", choices = select_pezzo_ID)
-        updateSelectInput(session, "venditore_ID", selected = NULL)
-        updateTextInput(session, "p_name", value = "")
-        updateTextInput(session, "description", value = "")
-        updateNumericInput(session, "height_cm", value = 0)
-        updateNumericInput(session, "length_cm", value = 0)
-        updateNumericInput(session, "width_cm", value = 0)
-        updateNumericInput(session, "p_lowEstimate", value = 0)
-        updateNumericInput(session, "p_highEstimate", value = 0)
-        updateDateInput(session, "p_added", value = NULL)
+        if (p_iv$is_valid()) {
+            if (magazzino$verifyName(input$p_name) == FALSE) {
+                nuovoPezzo = Pezzo$new(v_ID = input$venditore_ID,
+                                       p_n = input$p_name,
+                                       d = input$description,
+                                       h_cm = as.integer(input$height_cm),
+                                       l_cm = as.integer(input$length_cm),
+                                       w_cm = as.integer(input$width_cm),
+                                       p_low_e = as.integer(input$p_lowEstimate),
+                                       p_high_e = as.integer(input$p_highEstimate),
+                                       p_a = as.character(input$p_added))
+                
+                magazzino$addPezzo(nuovoPezzo)
+                magazzino$save("pezzi.csv")
+                data_p <- magazzino$getCsvContent()
+                output$tabellaPezzi <- DT::renderDataTable(data_p)
+                select_pezzo_ID <- magazzino$getSelectBoxContentPezzo()
+                p_iv$disable()
+                updateSelectInput(session, "pezzo_ID", choices = select_pezzo_ID)
+                updateSelectInput(session, "venditore_ID", selected = NULL)
+                updateTextInput(session, "p_name", value = "")
+                updateTextInput(session, "description", value = "")
+                updateNumericInput(session, "height_cm", value = 0)
+                updateNumericInput(session, "length_cm", value = 0)
+                updateNumericInput(session, "width_cm", value = 0)
+                updateNumericInput(session, "p_lowEstimate", value = 0)
+                updateNumericInput(session, "p_highEstimate", value = 0)
+                updateDateInput(session, "p_added", value = NULL)
+            } else {
+                shinyalert("Oops!", "The piece already exists", type = "error")
+            }
+        } else {
+            shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
+            p_iv$enable() 
+        }
     }) 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+# Auctions     
     aste$loadAuctions("aste.csv", "lotti.csv")
     data_aste <- aste$getCsvContentAste()
     output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single")

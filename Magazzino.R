@@ -35,7 +35,7 @@ Magazzino <- setRefClass(
       }
       data = data.frame(data)
       colnames(data) <-
-        c("ID", "vendor name", "vendor surname", "name", "description", "height (cm)", "length (cm)", "width (cm)", "low estimate", "high estimate", "added")
+        c("ID", "Vendor name", "Vendor surname", "Name", "Description", "Height (cm)", "Length (cm)", "Width (cm)", "Low estimate", "High estimate", "Added")
       return(data)
     },
     getSelectBoxContentPezzo = function() {
@@ -57,6 +57,14 @@ Magazzino <- setRefClass(
       print(getElementsContent())
       writeLines(getElementsContent(), myfile)
       close(myfile)
+    },
+    verifyName = function(name) {
+      for (pezzo_attuale in pieces) {
+        if (pezzo_attuale$p_name == name) {
+          return(TRUE)
+        } 
+      } 
+      return(FALSE)
     }
   )
 )

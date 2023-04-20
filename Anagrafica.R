@@ -75,7 +75,12 @@ Anagrafica <- setRefClass(
       return(FALSE)
     },
     resolveID = function(ID) {
-        return(c("v_name", "v_surname"))
+      for (venditore_attuale in vendors) {
+        if (venditore_attuale$h_ID == ID) {
+          return(c(venditore_attuale$v_name, venditore_attuale$v_surname))
+        }
+      }
+        
     }
   )
 )
