@@ -273,7 +273,7 @@ server <- function(input, output, session) {
                 anagrafica$addVenditore(nuovoVenditore)
                 anagrafica$save("prova.csv")
                 data <- anagrafica$getCsvContent()
-                output$tabellaVenditori <- DT::renderDataTable(data)
+                output$tabellaVenditori <- DT::renderDataTable(data, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
                 select_venditore_ID <- anagrafica$getSelectBoxContent()
                 v_iv$disable()
                 updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
@@ -303,15 +303,16 @@ server <- function(input, output, session) {
     p_iv$add_rule("venditore_ID", sv_required())
     p_iv$add_rule("p_name", sv_required())
     p_iv$add_rule("description", sv_required())
-    p_iv$add_rule("height_cm", sv_required())
-    p_iv$add_rule("length_cm", sv_required())
-    p_iv$add_rule("width_cm", sv_required())
-    p_iv$add_rule("p_lowEstimate", sv_required())
-    p_iv$add_rule("p_highEstimate", sv_required())
+    p_iv$add_rule("height_cm", sv_gt(0))
+    p_iv$add_rule("length_cm", sv_gt(0))
+    p_iv$add_rule("width_cm", sv_gt(0))
+    p_iv$add_rule("p_lowEstimate", sv_gt(0))
+    p_iv$add_rule("p_highEstimate", sv_gt(0))
     p_iv$add_rule("p_added", sv_required())
     
     observeEvent(input$addPiece, {
         print(input$venditore_ID)
+        p_iv$add_rule("p_highEstimate", sv_gt(input$p_lowEstimate))
         if (p_iv$is_valid()) {
             if (magazzino$verifyName(input$p_name) == FALSE) {
                 nuovoPezzo = Pezzo$new(v_ID = input$venditore_ID,
@@ -326,8 +327,8 @@ server <- function(input, output, session) {
                 
                 magazzino$addPezzo(nuovoPezzo)
                 magazzino$save("pezzi.csv")
-                data_p <- magazzino$getCsvContent()
-                output$tabellaPezzi <- DT::renderDataTable(data_p)
+                data_p <- magazzino$getCsvContent(anagrafica)
+                output$tabellaPezzi <- DT::renderDataTable(data_p, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
                 select_pezzo_ID <- magazzino$getSelectBoxContentPezzo()
                 p_iv$disable()
                 updateSelectInput(session, "pezzo_ID", choices = select_pezzo_ID)
@@ -352,7 +353,7 @@ server <- function(input, output, session) {
 # Auctions     
     aste$loadAuctions("aste.csv", "lotti.csv")
     data_aste <- aste$getCsvContentAste()
-    output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single")
+    output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
     
     observeEvent(input$addAuction, {
         
@@ -362,7 +363,7 @@ server <- function(input, output, session) {
         aste$addAuction(nuovaAsta)
         aste$save("aste.csv", "lotti.csv")
         data_aste <- aste$getCsvContentAste()
-        output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single")
+        output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
         select_asta_ID <- aste$getSelectBoxContentAste()
         updateSelectInput(session, "asta_ID", choices = select_asta_ID)
         updateDateInput(session, "dataInizio", value = NULL)
@@ -371,15 +372,18 @@ server <- function(input, output, session) {
    
      
     #asta$loadLots("lotti.csv")
-    data_lotti <- aste$getCsvContentLotti()
+    data_lotti <- aste$getCsvContentLotti(magazzino)
     select_pezzo_ID <- magazzino$getSelectBoxContentPezzo()
     updateSelectInput(session, "pezzo_ID", choices = select_pezzo_ID)
     select_asta_ID <- aste$getSelectBoxContentAste()
     updateSelectInput(session, "asta_ID", choices = select_asta_ID)
     observeEvent(input$tabellaAste_rows_selected, {
+        data_aste <- aste$getCsvContentAste()
+        data_lotti <- aste$getCsvContentLotti(magazzino)
+        print(data_lotti)
         id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
-        data_lotti_sub <- data_lotti[data_lotti$"auction ID"  %in% id_asta_selezionata, ]
-        output$tabellaLotti <- DT::renderDataTable(data_lotti_sub)
+        data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
+        output$tabellaLotti <- DT::renderDataTable(data_lotti_sub, options = list(columnDefs = list(list(visible = FALSE, targets = c(1, 4)))))
     })
     observeEvent(input$addLot, {
         print(input$pezzo_ID)
@@ -389,15 +393,22 @@ server <- function(input, output, session) {
             a_ID = input$asta_ID,
             l_pI = as.integer(input$l_prezzoIniziale),
             l_pM = as.integer(input$l_prezzoMartello))
-        
+       print(paste(input$pezzo_ID, input$asta_ID, input$l_prezzoIniziale, input$l_prezzoMartello)) 
         aste$addLot(nuovoLotto)
-        aste$save("aste.csv", "lotti.csv")
-        data_lotti <- aste$getCsvContentLotti()
-        output$tabellaLotti <- DT::renderDataTable(data_lotti)
-        updateSelectInput(session, "pezzo_ID", selected = NULL)
+        aste$save("aste.csv", "lotti.csv") 
+        print("checkpoint1")
+        data_lotti <- aste$getCsvContentLotti(magazzino)
+        print(data_lotti)
+        id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
+        print(id_asta_selezionata)
+        data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
+        print("checkpoint4")
+        output$tabellaLotti <- DT::renderDataTable(data_lotti_sub, options = list(columnDefs = list(list(visible = FALSE, targets = c(1, 4)))))
+        print("checkpoint5")
+        updateSelectInput(session, "asta_ID", selected = NULL)
         updateSelectInput(session, "pezzo_ID", selected = NULL)
         updateNumericInput(session, "l_prezzoIniziale", value = 0)
-        updateNumericInput(session, "p_prezzoMartello", value = 0)
+        updateNumericInput(session, "l_prezzoMartello", value = 0)
         
     }) 
 }

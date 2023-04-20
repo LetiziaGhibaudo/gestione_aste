@@ -65,6 +65,15 @@ Magazzino <- setRefClass(
         } 
       } 
       return(FALSE)
+    },
+    resolveID = function(ID) {
+      for (pezzo_attuale in pieces) {
+        if (pezzo_attuale$h_ID == ID) {
+          return(c(pezzo_attuale$p_name))
+        }
+      }
+      return(c("unknown")) 
+      
     }
   )
 )

@@ -33,11 +33,11 @@ Asta <- setRefClass(
     getCsvContent = function() {
       return(c(h_ID, dataInizio, dataFine))
     },
-    getCsvContentLotti = function() {
+    getCsvContentLotti = function(magazzino) {
       i = 1
-      data_lotti <- matrix(0, length(lotti), 5)
+      data_lotti <- matrix(0, length(lotti), 6)
       for(lotto_attuale in lotti) {
-        x <- lotto_attuale$getCsvContent()
+        x <- lotto_attuale$getCsvContent(magazzino)
         data_lotti[i,] <- x
         i = i + 1
       }

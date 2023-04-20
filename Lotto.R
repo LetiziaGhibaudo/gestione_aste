@@ -23,8 +23,9 @@ Lotto <- setRefClass(
     serialize = function() {
       return(paste(pezzo_ID, lotto_ID, asta_ID, l_prezzoIniziale, l_prezzoMartello, sep = ","))
     },
-    getCsvContent = function() {
-      return(c(pezzo_ID, lotto_ID, asta_ID, l_prezzoIniziale, l_prezzoMartello))
+    getCsvContent = function(magazzino) {
+      pezzo_nome <- magazzino$resolveID(pezzo_ID)
+      return(c(pezzo_ID, pezzo_nome[1], lotto_ID, asta_ID, l_prezzoIniziale, l_prezzoMartello))
     },
     unserialize = function(line) {
       list = strsplit(line, ",")

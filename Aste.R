@@ -47,15 +47,15 @@ Aste <- setRefClass(
         c("auction ID", "start time", "end time")
       return(data_aste)
     },
-    getCsvContentLotti = function() {
-      data_lotti <- matrix(0, 0, 5)
+    getCsvContentLotti = function(magazzino) {
+      data_lotti <- matrix(0, 0, 6)
       for (asta_attuale in auctions) {
-        x <- asta_attuale$getCsvContentLotti()
+        x <- asta_attuale$getCsvContentLotti(magazzino)
         data_lotti <- rbind(data_lotti, x)
       }
       data_lotti = data.frame(data_lotti)
       colnames(data_lotti) <-
-        c("piece ID", "lot ID", "auction ID", "start price", "hammer price")
+        c("Piece ID", "Piece name","Lot ID", "Auction ID", "Start price", "Hammer price")
       return(data_lotti)
     },
     getSelectBoxContentAste = function() {
