@@ -13,7 +13,7 @@ Asta <- setRefClass(
                           dataF = "undefined",
                           l = list(),
                           contatore = 1
-                          ) {
+    ) {
       h_ID <<- paste0("A", sample(1:1000000, 1))
       dataInizio <<- dataI
       dataFine <<- dataF
@@ -45,7 +45,6 @@ Asta <- setRefClass(
     },
     unserialize = function(line, file_name) {
       list = strsplit(line, ",")
-      print(length(unlist(list)))
       if (length(unlist(list)) > 2) {
         h_ID <<- unlist(list)[1]
         dataInizio <<- unlist(list)[2]
@@ -58,7 +57,6 @@ Asta <- setRefClass(
     },
     loadLots = function(file_name) {
       path <- getwd()
-      print(paste("load", path))
       myfile = file(paste(path, "/", file_name, sep = ""))
       lines = readLines(myfile)
       close(myfile)
@@ -66,8 +64,6 @@ Asta <- setRefClass(
       for (i in 1:entries) {
         lotto = Lotto$new()
         lotto$unserialize(lines[i])
-        print(h_ID)
-        print(lotto$asta_ID)
         if(lotto$asta_ID == h_ID) {
           lotti <<- c(lotti, lotto)
         } 
@@ -79,14 +75,6 @@ Asta <- setRefClass(
       contatore <<- contatore +1
       lotti <<- c(lotti, lotto)
     }
-    
   )
 )
-
-
-# lotto = Lotto$new()
-# asta = Asta$new()
-# asta$loadLots("lotti.csv")
-# asta$getCsvContentLotti()
-
 

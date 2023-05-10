@@ -10,7 +10,6 @@ Anagrafica <- setRefClass(
       # vendor and calls it (unserialize function), prints and processes all rows one by one, 
       # loading the csv file
       path <- getwd()
-      print(paste("load", path))
       myfile = file(paste(path, "/", file_name, sep = ""))
       lines = readLines(myfile)
       entries = length(lines)
@@ -46,23 +45,20 @@ Anagrafica <- setRefClass(
     getSelectBoxContent = function() {
       v_list <- list()
       for (venditore_attuale in vendors) {
-      label <- paste(venditore_attuale$v_name, venditore_attuale$v_surname, venditore_attuale$h_ID, sep = "-")  
-      v_list[[label]] <- venditore_attuale$h_ID
-      print(label)
+        label <- paste(venditore_attuale$v_name, venditore_attuale$v_surname, venditore_attuale$h_ID, sep = "-")  
+        v_list[[label]] <- venditore_attuale$h_ID
       }
       return(v_list)
-      },
-      
+    },
+    
     addVenditore = function(venditore) {
       # the function creates a new seller 
       vendors <<- c(vendors, venditore)
     },
     save = function(file_name) {
       path <- getwd()
-      print(paste("save", path))
       myfile = file(paste(path, "/", file_name, sep = ""), open = "w+")
       # the mode "w+" opens the file for reading and writing, truncating file initially
-      print(getElementsContent())
       writeLines(getElementsContent(), myfile)
       close(myfile)
     },
@@ -75,15 +71,15 @@ Anagrafica <- setRefClass(
       return(FALSE)
     },
     resolveID = function(ID) {
-        for (venditore_attuale in vendors) {
-          if (venditore_attuale$h_ID == ID) {
-            return(c(venditore_attuale$v_name, venditore_attuale$v_surname))
-          }
+      for (venditore_attuale in vendors) {
+        if (venditore_attuale$h_ID == ID) {
+          return(c(venditore_attuale$v_name, venditore_attuale$v_surname))
         }
+      }
       return(c("unknown", "unknown")) 
       
-      }
-      
+    }
+    
   )
 )
 

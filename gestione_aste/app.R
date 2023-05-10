@@ -15,6 +15,7 @@ library(shiny)
 library(DT)
 library(shinyvalidate)
 library(shinyalert)
+library(shinythemes)
 
 anagrafica <- Anagrafica$new()
 magazzino <- Magazzino$new()
@@ -23,229 +24,230 @@ asta <- Asta$new()
 select_venditore_ID <- anagrafica$getSelectBoxContent()
 select_pezzo_ID <- magazzino$getSelectBoxContentPezzo()
 select_asta_ID <- aste$getSelectBoxContentAste()
-#print(select)
+
 # UI: The user interface object controls the layout and appearance of the app
-ui <- fluidPage(# Application title
-    titlePanel("ARTEχNE - auction house solution"),
-    
-    mainPanel(tabsetPanel(
-        tabPanel(
-            "Vendors",
-            verbatimTextOutput("Venditori"),
-            fluidRow(column(
-                12,
-                br(),
-                br(),
-                DT::dataTableOutput("tabellaVenditori")
-            )),
-            br(),
-            br(),
-            br(),
-            h2("New vendor"),
-            verbatimTextOutput("Add Venditore"),
-            fluidRow(
-                column(4,
-                       br(),
-                       br(),
-                       textInput("v_name", h3("Name*"),
-                                 value = "")),
-                column(4,
-                       br(),
-                       br(),
-                       textInput("v_surname", h3("Surname*"),
-                                 value = "")),
-                column(4,
-                       br(),
-                       br(),
-                       textInput("v_address", h3("Address"),
-                                 value = ""))),
-            fluidRow(
-                column(4,
-                       br(),
-                       br(),
-                       textInput("v_phone", h3("Phone number"),
-                                 value = "")),
-                column(4,
-                       br(),
-                       br(),
-                       textInput("v_mail", h3("E-mail address*"),
-                                 value = "")),
-                column(4,
-                       br(),
-                       br(),
-                       numericInput("v_commission", h3("Commission (%)"),
-                                 value = 0, 
-                                 min = 0,
-                                 max = 100))),
-            fluidRow(
-                column(
-                    12,
-                    h3("New vendor"),
-                    useShinyalert(), 
-                    actionButton("addVendor", "Add vendor"),
-                    helpText("Click to insert the data")
+ui <- fluidPage(theme = shinytheme("flatly"),
+                # Application title
+                titlePanel(strong("ARTEχNE - auction house solution")),
+                
+                mainPanel(tabsetPanel(
+                    tabPanel(
+                        "Vendors",
+                        verbatimTextOutput("Venditori"),
+                        fluidRow(column(
+                            12,
+                            br(),
+                            br(),
+                            DT::dataTableOutput("tabellaVenditori")
+                        )),
+                        br(),
+                        br(),
+                        br(),
+                        h2(strong("New vendor")),
+                        verbatimTextOutput("Add Venditore"),
+                        fluidRow(
+                            column(4,
+                                   br(),
+                                   br(),
+                                   textInput("v_name", h3("Name*"),
+                                             value = "")),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   textInput("v_surname", h3("Surname*"),
+                                             value = "")),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   textInput("v_address", h3("Address"),
+                                             value = ""))),
+                        fluidRow(
+                            column(4,
+                                   br(),
+                                   br(),
+                                   textInput("v_phone", h3("Phone number"),
+                                             value = "")),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   textInput("v_mail", h3("E-mail address*"),
+                                             value = "")),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   numericInput("v_commission", h3("Commission (%)"),
+                                                value = 0, 
+                                                min = 0,
+                                                max = 100))),
+                        fluidRow(
+                            column(
+                                12,
+                                h3(strong("New vendor")),
+                                useShinyalert(), 
+                                actionButton("addVendor", "Add vendor"),
+                                helpText("Click to insert the data")
+                            )
+                        )
+                    ),
+                    
+                    tabPanel(
+                        "Pieces",
+                        verbatimTextOutput("Pezzi"),
+                        fluidRow(column(
+                            12,
+                            br(),
+                            br(),
+                            DT::dataTableOutput("tabellaPezzi")
+                        )),
+                        br(),
+                        br(),
+                        br(),
+                        h2(strong("New piece")),
+                        verbatimTextOutput("Add Piece"),
+                        fluidRow(
+                            column(4,
+                                   br(),
+                                   br(),
+                                   selectInput("venditore_ID", label = h3("Select vendor*"),
+                                               select_venditore_ID)),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   textInput("p_name", h3("Name*"),
+                                             value = "")),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   textInput("description", h3("Description*"),
+                                             value = ""))),
+                        fluidRow(
+                            column(4,
+                                   br(),
+                                   br(),
+                                   numericInput("height_cm", h3("Height (cm)*"),
+                                                value = 0)),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   numericInput("length_cm", h3("Length (cm)*"),
+                                                value = 0)),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   numericInput("width_cm", h3("Width (cm)*"),
+                                                value = 0))),
+                        fluidRow(
+                            column(4,
+                                   br(),
+                                   br(),
+                                   numericInput(
+                                       "p_lowEstimate", h3("Low estimate*"),
+                                       value = 0
+                                   )),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   numericInput(
+                                       "p_highEstimate", h3("High estimate*"),
+                                       value = 0
+                                   )),
+                            column(4,
+                                   br(),
+                                   br(),
+                                   dateInput("p_added", h3("Added*"),
+                                             value = ""))),
+                        fluidRow(
+                            column(
+                                12,
+                                h3(strong("New piece")),
+                                actionButton("addPiece", "Add piece"),
+                                helpText("Click to insert the data")
+                            )
+                        )
+                    ),
+                    tabPanel(
+                        "Auctions",
+                        verbatimTextOutput("Aste"),
+                        fluidRow(
+                            column(
+                                6,
+                                h2(strong("Auctions")),
+                                br(),
+                                br(),
+                                DT::dataTableOutput("tabellaAste")
+                            ),
+                            column(
+                                6,
+                                h2(strong("Lots")),
+                                br(),
+                                br(),
+                                DT::dataTableOutput("tabellaLotti")
+                            ),
+                            br(),
+                            br(),
+                            br(),
+                        ),
+                        fluidRow(
+                            column(6,
+                                   br(),
+                                   br(),
+                                   br(),
+                                   h2(strong("New auction")),
+                                   verbatimTextOutput("Add Auction")),
+                            column(6,
+                                   br(),
+                                   br(),
+                                   br(),
+                                   h2(strong("New lot")),
+                                   verbatimTextOutput("Add Lot"))
+                        ),
+                        fluidRow(
+                            column(3,
+                                   br(),
+                                   dateInput("dataInizio", h3("Start time*"),
+                                             value = "")),
+                            column(3,
+                                   br(),
+                                   dateInput("dataFine", h3("End time*"),
+                                             value = "")),
+                            column(3,
+                                   br(),
+                                   selectInput(
+                                       "asta_ID", label = h3("Auction*"),
+                                       select_asta_ID
+                                   )),
+                            column(3,
+                                   br(),
+                                   selectInput(
+                                       "pezzo_ID", label = h3("Piece*"),
+                                       select_pezzo_ID
+                                   )),
+                        ),
+                        fluidRow(
+                            column(6),
+                            column(3,
+                                   br(),
+                                   numericInput("l_prezzoIniziale", h4("Start price*"),
+                                                value = 0)),
+                            column(3,
+                                   br(),
+                                   numericInput("l_prezzoMartello", h4("Hammer price"),
+                                                value = 0)),
+                        ),
+                        fluidRow(
+                            column(6,
+                                   h3(strong("New auction")),
+                                   actionButton("addAuction", "Add auction"),
+                                   helpText("Click to insert the data")),
+                            column(6,
+                                   h3(strong("New lot")),
+                                   actionButton("addLot", "Add lot"),
+                                   helpText("Click to insert the data"))
+                        )
+                    )
                 )
-            )
-            
-        ),
-        
-        tabPanel(
-            "Pieces",
-            verbatimTextOutput("Pezzi"),
-            fluidRow(column(
-                12,
-                br(),
-                br(),
-                DT::dataTableOutput("tabellaPezzi")
-            )),
-            br(),
-            br(),
-            br(),
-            h2("New piece"),
-            verbatimTextOutput("Add Piece"),
-            fluidRow(
-                column(4,
-                       br(),
-                       br(),
-                       selectInput("venditore_ID", label = h3("Select vendor*"),
-                                    select_venditore_ID)),
-                column(4,
-                       br(),
-                       br(),
-                       textInput("p_name", h3("Name*"),
-                                 value = "")),
-                column(4,
-                       br(),
-                       br(),
-                       textInput("description", h3("Description*"),
-                                 value = ""))),
-            fluidRow(
-                column(4,
-                       br(),
-                       br(),
-                       numericInput("height_cm", h3("Height (cm)*"),
-                                    value = 0)),
-                column(4,
-                       br(),
-                       br(),
-                       numericInput("length_cm", h3("Length (cm)*"),
-                                    value = 0)),
-                column(4,
-                       br(),
-                       br(),
-                       numericInput("width_cm", h3("Width (cm)*"),
-                                    value = 0))),
-            fluidRow(
-                column(4,
-                       br(),
-                       br(),
-                       numericInput(
-                           "p_lowEstimate", h3("Low estimate*"),
-                           value = 0
-                       )),
-                column(4,
-                       br(),
-                       br(),
-                       numericInput(
-                           "p_highEstimate", h3("High estimate*"),
-                           value = 0
-                       )),
-                column(4,
-                       br(),
-                       br(),
-                       dateInput("p_added", h3("Added*"),
-                                 value = ""))),
-            fluidRow(
-                column(
-                    12,
-                    h3("New piece"),
-                    actionButton("addPiece", "Add piece"),
-                    helpText("Click to insert the data")
                 )
-            )
-            
-        ),
-        tabPanel(
-            "Auctions",
-            verbatimTextOutput("Aste"),
-            fluidRow(
-                column(
-                    6,
-                    br(),
-                    br(),
-                    h2("Auctions"),
-                    br(),
-                    br(),
-                    DT::dataTableOutput("tabellaAste")
-                ),
-                column(
-                    6,
-                    br(),
-                    br(),
-                    h2("Lots"),
-                    br(),
-                    br(),
-                    DT::dataTableOutput("tabellaLotti")
-                ),
-                br(),
-                br(),
-                br(),
-            ),
-            fluidRow(
-                column(6,
-                       
-                       h2("New auction"),
-                       verbatimTextOutput("Add Auction")),
-                column(6,
-                       h2("New lot"),
-                       verbatimTextOutput("Add Lot"))
-            ),
-            fluidRow(
-                column(3,
-                       br(),
-                       dateInput("dataInizio", h3("Start time"),
-                                 value = "")),
-                column(3,
-                       br(),
-                       dateInput("dataFine", h3("End time"),
-                                 value = "")),
-                column(3,
-                       br(),
-                       selectInput(
-                           "asta_ID", label = h3("Auction"),
-                           select_asta_ID
-                       )),
-                column(3,
-                       br(),
-                       selectInput(
-                           "pezzo_ID", label = h3("Piece"),
-                           select_pezzo_ID
-                       )),
-            ),
-            fluidRow(
-                column(6),
-                column(3,
-                       br(),
-                       numericInput("l_prezzoIniziale", h4("Start price"),
-                                    value = 0)),
-                column(3,
-                       br(),
-                       numericInput("l_prezzoMartello", h4("Hammer price"),
-                                    value = 0)),
-                       ),
-            fluidRow(
-                column(6,
-                       h3("New auction"),
-                       actionButton("addAuction", "Add auction"),
-                       helpText("Click to insert the data")),
-                column(6,
-                       h3("New lot"),
-                       actionButton("addLot", "Add lot"),
-                       helpText("Click to insert the data"))
-            )
-            )
-        )
-    ))
+)
 
 
 
@@ -290,10 +292,9 @@ server <- function(input, output, session) {
             shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
             v_iv$enable() 
         }
-        
     })
     
-# Pieces 
+    # Pieces 
     magazzino$load("pezzi.csv")
     data_p <- magazzino$getCsvContent(anagrafica)
     select_venditore_ID <- anagrafica$getSelectBoxContent()
@@ -311,7 +312,6 @@ server <- function(input, output, session) {
     p_iv$add_rule("p_added", sv_required())
     
     observeEvent(input$addPiece, {
-        print(input$venditore_ID)
         p_iv$add_rule("p_highEstimate", sv_gt(input$p_lowEstimate))
         if (p_iv$is_valid()) {
             if (magazzino$verifyName(input$p_name) == FALSE) {
@@ -349,29 +349,37 @@ server <- function(input, output, session) {
             p_iv$enable() 
         }
     }) 
-
-# Auctions     
+    
+    # Auctions     
     aste$loadAuctions("aste.csv", "lotti.csv")
     data_aste <- aste$getCsvContentAste()
     output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
+    a_iv <- InputValidator$new()
+    a_iv$add_rule("dataInizio", sv_required())
+    a_iv$add_rule("dataFine", sv_required())
     
     observeEvent(input$addAuction, {
-        
-        nuovaAsta = Asta$new(dataI = as.character(input$dataInizio),
-                             dataF = as.character(input$dataFine))
-        
-        aste$addAuction(nuovaAsta)
-        aste$save("aste.csv", "lotti.csv")
-        data_aste <- aste$getCsvContentAste()
-        output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
-        select_asta_ID <- aste$getSelectBoxContentAste()
-        updateSelectInput(session, "asta_ID", choices = select_asta_ID)
-        updateDateInput(session, "dataInizio", value = NULL)
-        updateDateInput(session, "dataFine", value = NULL)
+        if (a_iv$is_valid()) {
+            nuovaAsta = Asta$new(dataI = as.character(input$dataInizio),
+                                 dataF = as.character(input$dataFine))
+            
+            aste$addAuction(nuovaAsta)
+            aste$save("aste.csv", "lotti.csv")
+            data_aste <- aste$getCsvContentAste()
+            output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
+            select_asta_ID <- aste$getSelectBoxContentAste()
+            a_iv$disable()
+            updateSelectInput(session, "asta_ID", choices = select_asta_ID)
+            updateDateInput(session, "dataInizio", value = NULL)
+            updateDateInput(session, "dataFine", value = NULL)
+        } else {
+            shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
+            a_iv$enable() 
+        }
     }) 
-   
-     
-    #asta$loadLots("lotti.csv")
+    
+    
+    # Lots    
     data_lotti <- aste$getCsvContentLotti(magazzino)
     select_pezzo_ID <- magazzino$getSelectBoxContentPezzo()
     updateSelectInput(session, "pezzo_ID", choices = select_pezzo_ID)
@@ -380,42 +388,45 @@ server <- function(input, output, session) {
     observeEvent(input$tabellaAste_rows_selected, {
         data_aste <- aste$getCsvContentAste()
         data_lotti <- aste$getCsvContentLotti(magazzino)
-        print(data_lotti)
         id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
         data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
         output$tabellaLotti <- DT::renderDataTable(data_lotti_sub, options = list(columnDefs = list(list(visible = FALSE, targets = c(1, 4)))))
     })
+    l_iv <- InputValidator$new()
+    l_iv$add_rule("asta_ID", sv_required())
+    l_iv$add_rule("pezzo_ID", sv_required())
+    l_iv$add_rule("l_prezzoIniziale", sv_gt(0))
+    l_iv$add_rule("l_prezzoMartello", sv_gt(0))
+    
     observeEvent(input$addLot, {
-        print(input$pezzo_ID)
-        print(input$asta_ID)
-        nuovoLotto = Lotto$new(
-            p_ID = input$pezzo_ID,
-            a_ID = input$asta_ID,
-            l_pI = as.integer(input$l_prezzoIniziale),
-            l_pM = as.integer(input$l_prezzoMartello))
-       print(paste(input$pezzo_ID, input$asta_ID, input$l_prezzoIniziale, input$l_prezzoMartello)) 
-        aste$addLot(nuovoLotto)
-        aste$save("aste.csv", "lotti.csv") 
-        print("checkpoint1")
-        data_lotti <- aste$getCsvContentLotti(magazzino)
-        print(data_lotti)
-        id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
-        print(id_asta_selezionata)
-        data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
-        print("checkpoint4")
-        output$tabellaLotti <- DT::renderDataTable(data_lotti_sub, options = list(columnDefs = list(list(visible = FALSE, targets = c(1, 4)))))
-        print("checkpoint5")
-        updateSelectInput(session, "asta_ID", selected = NULL)
-        updateSelectInput(session, "pezzo_ID", selected = NULL)
-        updateNumericInput(session, "l_prezzoIniziale", value = 0)
-        updateNumericInput(session, "l_prezzoMartello", value = 0)
-        
+        l_iv$add_rule("l_prezzoMartello", sv_gte(input$l_prezzoIniziale))
+        if (l_iv$is_valid()) {
+            nuovoLotto = Lotto$new(
+                p_ID = input$pezzo_ID,
+                a_ID = input$asta_ID,
+                l_pI = as.integer(input$l_prezzoIniziale),
+                l_pM = as.integer(input$l_prezzoMartello))
+            aste$addLot(nuovoLotto)
+            aste$save("aste.csv", "lotti.csv") 
+            data_lotti <- aste$getCsvContentLotti(magazzino)
+            id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
+            data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
+            output$tabellaLotti <- DT::renderDataTable(data_lotti_sub, options = list(columnDefs = list(list(visible = FALSE, targets = c(1, 4)))))
+            l_iv$disable()
+            updateSelectInput(session, "asta_ID", selected = NULL)
+            updateSelectInput(session, "pezzo_ID", selected = NULL)
+            updateNumericInput(session, "l_prezzoIniziale", value = 0)
+            updateNumericInput(session, "l_prezzoMartello", value = 0) 
+        }  else {
+            shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
+            l_iv$enable() 
+        }
     }) 
 }
-    
+
 
 # Run the application
 if(interactive()) {
-shinyApp(ui = ui, server = server)
-    }
+    shinyApp(ui = ui, server = server)
+}
 

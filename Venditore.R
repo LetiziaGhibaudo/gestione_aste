@@ -39,18 +39,17 @@ Venditore <- setRefClass(
     unserialize = function(line) {
       # The unserialize function divides the various elements of the csv row and returns a list 
       list = strsplit(line, ",")
-      print(length(unlist(list)))
       if (length(unlist(list)) > 5) {
-      h_ID <<- unlist(list)[1]
-      v_name <<- unlist(list)[2]
-      v_surname <<- unlist(list)[3]
-      v_address <<- unlist(list) [4]
-      v_phone <<- unlist(list)[5]
-      v_mail <<- unlist(list)[6]
-      if (length(unlist(list)) > 6) {
-        v_commission <<- unlist(list)[7]
-      }
-      return(TRUE)
+        h_ID <<- unlist(list)[1]
+        v_name <<- unlist(list)[2]
+        v_surname <<- unlist(list)[3]
+        v_address <<- unlist(list) [4]
+        v_phone <<- unlist(list)[5]
+        v_mail <<- unlist(list)[6]
+        if (length(unlist(list)) > 6) {
+          v_commission <<- unlist(list)[7]
+        }
+        return(TRUE)
       }
       return(FALSE)
     }

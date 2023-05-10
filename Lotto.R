@@ -13,7 +13,7 @@ Lotto <- setRefClass(
                           a_ID = "undefined",
                           l_pI = 0,
                           l_pM = 0
-                          ) {
+    ) {
       pezzo_ID <<- p_ID
       lotto_ID <<- l_ID
       asta_ID <<- a_ID
@@ -29,7 +29,6 @@ Lotto <- setRefClass(
     },
     unserialize = function(line) {
       list = strsplit(line, ",")
-      print(length(unlist(list)))
       if (length(unlist(list)) > 3) {
         pezzo_ID <<- unlist(list)[1]
         lotto_ID <<- unlist(list)[2]

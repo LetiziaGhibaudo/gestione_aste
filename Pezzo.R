@@ -42,7 +42,6 @@ Pezzo <- setRefClass(
     },
     unserialize = function(line) {
       list = strsplit(line, ",")
-      print(length(unlist(list)))
       if (length(unlist(list)) > 8) {
         h_ID <<- unlist(list)[1]
         venditore_ID <<- unlist(list)[2]
@@ -62,13 +61,3 @@ Pezzo <- setRefClass(
     }
   )
 )
-
-
-
-#write.table(x = "345678, 224135, Les Mariés au village le soir, Marc CHAGALL signed (lower center) - 
-#oil tempera and pencil on canvas, 27, 46, , 30000000, 5000000, 15/02/2023\n
-#456789, 123456, Trois danseuses, Edgar DEGAS (1834-1917) signed 'Degas' (lower right) pastel and charcoal on paper laid down on board, 80, 51, 1500000, 2000000, 20/01/2023\n
-#567890, 234567, Pair of Chests of Drawers designed circa 1957, Gio PONTI (1891-1979) manufactured by Giordano Chiesa Italy maple laminate brass, 79, 100, 47, 80000, 120000, 15/05/2021",
-#            file = paste("~/Documents/GitHub/gestione_aste", "/pezzi.csv", sep = ""),
-#            row.names = FALSE, col.names = FALSE, quote = FALSE)
-
