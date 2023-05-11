@@ -1,6 +1,7 @@
 # The class Asta contains the information about the auctions (associated lots, starting and ending time, 
 # and ID) and the functions for content serialization; thus we can convert the content of a class into 
 # a text string and vice versa
+# Furthermore, this class is responsible for loading the lots list
 source("~/Documents/GitHub/gestione_aste/Lotto.R")
 Asta <- setRefClass(
   "Asta",
@@ -70,6 +71,7 @@ Asta <- setRefClass(
       for (i in 1:entries) {
         lotto = Lotto$new()
         lotto$unserialize(lines[i])
+        # We associate the lot to its auction 
         if(lotto$asta_ID == h_ID) {
           lotti <<- c(lotti, lotto)
         } 

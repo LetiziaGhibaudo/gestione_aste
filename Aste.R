@@ -1,4 +1,4 @@
-# The class Aste is responsible for loading and saving the auctions and lots lists;
+# The class Aste is responsible for loading and saving the auctions list;
 # Furthermore, we can add new auctions (and associate lots) and they will be saved 
 # in the csv file as new rows
 source("~/Documents/GitHub/gestione_aste/Asta.R")
