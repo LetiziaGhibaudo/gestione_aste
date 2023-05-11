@@ -1,7 +1,12 @@
+# The class Pezzo contains the information about the pieces (associated vendor ID, piece name, 
+# description, dimensions, low and high estimate, date, and ID) and the functions for content 
+# serialization; thus we can convert the content of a class into a text string and vice versa
 Pezzo <- setRefClass(
   "Pezzo",
   fields = list(
     h_ID = "character",
+    # "h_" means "hidden": it is a private field and the end user cannot see it or use it. 
+    # Every time a new piece is created we associate a unique ID number
     venditore_ID = "character", 
     p_name = "character",
     description = "character",
@@ -34,6 +39,7 @@ Pezzo <- setRefClass(
       p_added <<- p_a
     },
     serialize = function() {
+      # The serialize function is a method to convert all content (piece) to a csv row
       return(paste(h_ID, venditore_ID, p_name, description, height_cm, length_cm, width_cm, p_lowEstimate, p_highEstimate, p_added, sep = ","))
     },
     getCsvContent = function(anagrafica) {
@@ -41,6 +47,7 @@ Pezzo <- setRefClass(
       return(c(h_ID, venditore_nome_cognome[1], venditore_nome_cognome[2], p_name, description, height_cm, length_cm, width_cm, p_lowEstimate, p_highEstimate, p_added))
     },
     unserialize = function(line) {
+      # The unserialize function divides the various elements of the csv row and returns a list
       list = strsplit(line, ",")
       if (length(unlist(list)) > 8) {
         h_ID <<- unlist(list)[1]

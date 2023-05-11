@@ -1,11 +1,11 @@
-# The class Venditore contains the information about the sellers (name, surname, address, and ID)
-# and the functions for content serialization; thus we can convert the content of a class into a 
-# text string and vice versa
+# The class Venditore contains the information about the sellers (name, surname, address, e-mail, 
+# commission, and ID) and the functions for content serialization; thus we can convert the content 
+# of a class into a text string and vice versa
 Venditore <- setRefClass(
   "Venditore",
   fields = list(
     h_ID = "character",
-    # "h_" means "hidden": it is a private field and the end user cannot see it or use it, 
+    # "h_" means "hidden": it is a private field and the end user cannot see it or use it. 
     # Every time a new seller is created we associate a unique ID number
     v_name = "character",
     v_surname = "character",
@@ -21,7 +21,7 @@ Venditore <- setRefClass(
                           v_ph = "",
                           v_mail = "",
                           v_comm = "") {
-      h_ID <<- paste0("V", sample(1:1000000, 1))
+      h_ID <<- paste0("V", sample(1:1000000, 1)) 
       v_name <<- v_n
       v_surname <<- v_s
       v_address <<- v_a

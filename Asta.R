@@ -1,8 +1,13 @@
+# The class Asta contains the information about the auctions (associated lots, starting and ending time, 
+# and ID) and the functions for content serialization; thus we can convert the content of a class into 
+# a text string and vice versa
 source("~/Documents/GitHub/gestione_aste/Lotto.R")
 Asta <- setRefClass(
   "Asta",
   fields = list(
     h_ID = "character",
+    # "h_" means "hidden": it is a private field and the end user cannot see it or use it. 
+    # Every time a new auction is created we associate a unique ID number
     dataInizio = "character",
     dataFine = "character",
     lotti = "list",
@@ -12,8 +17,7 @@ Asta <- setRefClass(
     initialize = function(dataI = "undefined",
                           dataF = "undefined",
                           l = list(),
-                          contatore = 1
-    ) {
+                          contatore = 1) {
       h_ID <<- paste0("A", sample(1:1000000, 1))
       dataInizio <<- dataI
       dataFine <<- dataF
@@ -21,6 +25,7 @@ Asta <- setRefClass(
       contatore <<- 1
     },
     serialize = function() {
+      # The serialize function is a method to convert all content (auction) to a csv row
       return(paste(h_ID, dataInizio, dataFine, contatore, sep = ","))
     },
     getElementsContentLotti = function() {
@@ -44,6 +49,7 @@ Asta <- setRefClass(
       return(data_lotti)
     },
     unserialize = function(line, file_name) {
+      # The unserialize function divides the various elements of the csv row and returns a list
       list = strsplit(line, ",")
       if (length(unlist(list)) > 2) {
         h_ID <<- unlist(list)[1]
@@ -68,7 +74,6 @@ Asta <- setRefClass(
           lotti <<- c(lotti, lotto)
         } 
       }
-      
     },
     addLotto = function(lotto) {
       lotto$lotto_ID <- as.character(contatore)

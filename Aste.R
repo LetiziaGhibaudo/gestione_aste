@@ -1,3 +1,6 @@
+# The class Aste is responsible for loading and saving the auctions and lots lists;
+# Furthermore, we can add new auctions (and associate lots) and they will be saved 
+# in the csv file as new rows
 source("~/Documents/GitHub/gestione_aste/Asta.R")
 Aste <- setRefClass(
   "Aste",
@@ -6,6 +9,9 @@ Aste <- setRefClass(
   ),
   methods = list(
     loadAuctions = function(file_name_aste, file_name_lotti) {
+      # loadAuctions is a function that takes the auctions file name and the lots file name as 
+      # parameters, for each row creates an auction and calls it (unserialize function), prints and 
+      # processes all rows one by one, loading the csv file
       path <- getwd()
       myfile = file(paste(path, "/", file_name_aste, sep = ""))
       lines = readLines(myfile)
@@ -18,7 +24,6 @@ Aste <- setRefClass(
         auctions <<- c(auctions, asta)
       }
     },
-    
     getElementsContentAste = function() {
       data_aste <- c()
       for (asta_attuale in auctions) {
@@ -36,6 +41,7 @@ Aste <- setRefClass(
     getCsvContentAste = function() {
       i = 1
       data_aste <- matrix(0, length(auctions), 3)
+      # we create a matrix that will be filled with the auctions data
       for (asta_attuale in auctions) {
         x <- asta_attuale$getCsvContent()
         data_aste[i,] <- x
@@ -48,6 +54,7 @@ Aste <- setRefClass(
     },
     getCsvContentLotti = function(magazzino) {
       data_lotti <- matrix(0, 0, 6)
+      # we create a matrix that will be filled with the lots data
       for (asta_attuale in auctions) {
         x <- asta_attuale$getCsvContentLotti(magazzino)
         data_lotti <- rbind(data_lotti, x)
@@ -66,6 +73,7 @@ Aste <- setRefClass(
       return(a_list)
     },
     addLot = function(lotto) {
+      # the function creates a new lot 
       for (asta_attuale in auctions) {
         if (asta_attuale$h_ID == lotto$asta_ID) {
           asta_attuale$addLotto(lotto)
@@ -73,12 +81,14 @@ Aste <- setRefClass(
       }
     },
     addAuction = function(asta) {
+      # the function creates a new auction
       auctions <<- c(auctions, asta)
     },
     save = function(file_name_aste, file_name_lotti) {
       path <- getwd()
       if (length(getElementsContentAste()) > 0) {
         myfile_aste = file(paste(path, "/", file_name_aste, sep = ""), open = "w+")
+        # the mode "w+" opens the file for reading and writing, truncating file initially
         writeLines(getElementsContentAste(), myfile_aste)
         close(myfile_aste)
       }
