@@ -31,6 +31,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 titlePanel(strong("ARTEχNE - auction house solution")),
                 
                 mainPanel(tabsetPanel(
+                    # This tab controls the layout of the vendors part
                     tabPanel(
                         "Vendors",
                         verbatimTextOutput("Venditori"),
@@ -89,7 +90,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             )
                         )
                     ),
-                    
+                    # This tab controls the layout of the pieces part
                     tabPanel(
                         "Pieces",
                         verbatimTextOutput("Pezzi"),
@@ -165,6 +166,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             )
                         )
                     ),
+                    # This tab controls the layout of the auctions (and lots) part
                     tabPanel(
                         "Auctions",
                         verbatimTextOutput("Aste"),
@@ -250,20 +252,25 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 )
 
 
-
 # Server: The server function contains the instructions to build the app
 server <- function(input, output, session) {
+    # Vendors 
     anagrafica$load("prova.csv")
     data <- anagrafica$getCsvContent()
+    # We create the vendors table and we hide the column containing the vendor ID
     output$tabellaVenditori <- DT::renderDataTable(data, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
+    # We verify that all the required fields are filled 
     v_iv <- InputValidator$new()
     v_iv$add_rule("v_name", sv_required())
     v_iv$add_rule("v_surname", sv_required())
     v_iv$add_rule("v_mail", sv_required())
+    # We verify that the address is a valid e-mail address
     v_iv$add_rule("v_mail", sv_email())
-    
+    # To add a new vendor
     observeEvent(input$addVendor, {
+        # If all the required fields are verified we can proceed 
         if (v_iv$is_valid()) {
+            # If the vendor's name and surname do not exist we can create a new vendor
             if (anagrafica$verifyNameSurname(input$v_name, input$v_surname) == FALSE) {
                 nuovoVenditore = Venditore$new(v_n = input$v_name,
                                                v_s = input$v_surname,
@@ -271,9 +278,9 @@ server <- function(input, output, session) {
                                                v_ph = input$v_phone,
                                                v_mail = input$v_mail,
                                                v_comm = as.character(input$v_commission))
-                
                 anagrafica$addVenditore(nuovoVenditore)
                 anagrafica$save("prova.csv")
+                # To update the table and make the new vendor visible
                 data <- anagrafica$getCsvContent()
                 output$tabellaVenditori <- DT::renderDataTable(data, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
                 select_venditore_ID <- anagrafica$getSelectBoxContent()
@@ -286,9 +293,12 @@ server <- function(input, output, session) {
                 updateTextInput(session, "v_mail", value = "")
                 updateNumericInput(session, "v_commission", value = 0)
             } else {
+                # If after the verification of the vendor's name and surname it results that they already exist
+                # an alert will appear
                 shinyalert("Oops!", "The user already exists", type = "error")
             }
         } else {
+            # If after the verification of all the required fields it results that some are empty an alert will appear
             shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
             v_iv$enable() 
         }
@@ -299,7 +309,9 @@ server <- function(input, output, session) {
     data_p <- magazzino$getCsvContent(anagrafica)
     select_venditore_ID <- anagrafica$getSelectBoxContent()
     updateSelectInput(session, "venditore_ID", choices = select_venditore_ID)
+    # We create the pieces table and we hide the column containing the piece ID
     output$tabellaPezzi <- DT::renderDataTable(data_p, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
+    # We verify that all the required fields are filled and that the numeric fields are greater than zero
     p_iv <- InputValidator$new()
     p_iv$add_rule("venditore_ID", sv_required())
     p_iv$add_rule("p_name", sv_required())
@@ -310,10 +322,13 @@ server <- function(input, output, session) {
     p_iv$add_rule("p_lowEstimate", sv_gt(0))
     p_iv$add_rule("p_highEstimate", sv_gt(0))
     p_iv$add_rule("p_added", sv_required())
-    
+    # To add a new piece
     observeEvent(input$addPiece, {
+        # We verify that the high etimate is greater than the low estimate 
         p_iv$add_rule("p_highEstimate", sv_gt(input$p_lowEstimate))
+        # If all the required fields are verified we can proceed
         if (p_iv$is_valid()) {
+            # If the piece's name does not exist we can create a new piece
             if (magazzino$verifyName(input$p_name) == FALSE) {
                 nuovoPezzo = Pezzo$new(v_ID = input$venditore_ID,
                                        p_n = input$p_name,
@@ -324,9 +339,9 @@ server <- function(input, output, session) {
                                        p_low_e = as.integer(input$p_lowEstimate),
                                        p_high_e = as.integer(input$p_highEstimate),
                                        p_a = as.character(input$p_added))
-                
                 magazzino$addPezzo(nuovoPezzo)
                 magazzino$save("pezzi.csv")
+                # To update the table and make the new piece visible
                 data_p <- magazzino$getCsvContent(anagrafica)
                 output$tabellaPezzi <- DT::renderDataTable(data_p, options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
                 select_pezzo_ID <- magazzino$getSelectBoxContentPezzo()
@@ -342,9 +357,11 @@ server <- function(input, output, session) {
                 updateNumericInput(session, "p_highEstimate", value = 0)
                 updateDateInput(session, "p_added", value = NULL)
             } else {
+                # If after the verification of the piece's name it results that it already exists an alert will appear
                 shinyalert("Oops!", "The piece already exists", type = "error")
             }
         } else {
+            # If after the verification of all the required fields it results that some are empty an alert will appear
             shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
             p_iv$enable() 
         }
@@ -353,18 +370,22 @@ server <- function(input, output, session) {
     # Auctions     
     aste$loadAuctions("aste.csv", "lotti.csv")
     data_aste <- aste$getCsvContentAste()
+    # We create the auctions table and we hide the column containing the auction ID
+    # Thanks to selection = "single", we can select the auction we are interested in (and the lots associated will appear)
     output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
+    # We verify that all the required fields are filled
     a_iv <- InputValidator$new()
     a_iv$add_rule("dataInizio", sv_required())
     a_iv$add_rule("dataFine", sv_required())
-    
+    # To add a new auction
     observeEvent(input$addAuction, {
+        # If all the required fields are verified we can proceed
         if (a_iv$is_valid()) {
             nuovaAsta = Asta$new(dataI = as.character(input$dataInizio),
                                  dataF = as.character(input$dataFine))
-            
             aste$addAuction(nuovaAsta)
             aste$save("aste.csv", "lotti.csv")
+            # To update the table and make the new auction visible
             data_aste <- aste$getCsvContentAste()
             output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
             select_asta_ID <- aste$getSelectBoxContentAste()
@@ -373,11 +394,11 @@ server <- function(input, output, session) {
             updateDateInput(session, "dataInizio", value = NULL)
             updateDateInput(session, "dataFine", value = NULL)
         } else {
+            # If after the verification of all the required fields it results that some are empty an alert will appear
             shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
             a_iv$enable() 
         }
     }) 
-    
     
     # Lots    
     data_lotti <- aste$getCsvContentLotti(magazzino)
@@ -385,21 +406,26 @@ server <- function(input, output, session) {
     updateSelectInput(session, "pezzo_ID", choices = select_pezzo_ID)
     select_asta_ID <- aste$getSelectBoxContentAste()
     updateSelectInput(session, "asta_ID", choices = select_asta_ID)
+    # We create the table of the lots associated to the auction we have selected
     observeEvent(input$tabellaAste_rows_selected, {
         data_aste <- aste$getCsvContentAste()
         data_lotti <- aste$getCsvContentLotti(magazzino)
         id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
         data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
+        # We hide the columns containing the auction ID and the piece ID
         output$tabellaLotti <- DT::renderDataTable(data_lotti_sub, options = list(columnDefs = list(list(visible = FALSE, targets = c(1, 4)))))
     })
+    # We verify that all the required fields are filled and that the numeric fields are greater than zero 
     l_iv <- InputValidator$new()
     l_iv$add_rule("asta_ID", sv_required())
     l_iv$add_rule("pezzo_ID", sv_required())
     l_iv$add_rule("l_prezzoIniziale", sv_gt(0))
     l_iv$add_rule("l_prezzoMartello", sv_gt(0))
-    
+    # To add a new lot
     observeEvent(input$addLot, {
+        # We verify that the hammer price is greater than (or at least equal to) the starting price 
         l_iv$add_rule("l_prezzoMartello", sv_gte(input$l_prezzoIniziale))
+        # If all the required fields are verified we can proceed
         if (l_iv$is_valid()) {
             nuovoLotto = Lotto$new(
                 p_ID = input$pezzo_ID,
@@ -408,6 +434,7 @@ server <- function(input, output, session) {
                 l_pM = as.integer(input$l_prezzoMartello))
             aste$addLot(nuovoLotto)
             aste$save("aste.csv", "lotti.csv") 
+            # To update the table and make the new lot visible
             data_lotti <- aste$getCsvContentLotti(magazzino)
             id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
             data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
@@ -418,6 +445,7 @@ server <- function(input, output, session) {
             updateNumericInput(session, "l_prezzoIniziale", value = 0)
             updateNumericInput(session, "l_prezzoMartello", value = 0) 
         }  else {
+            # If after the verification of all the required fields it results that some are empty an alert will appear
             shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
             l_iv$enable() 
         }
