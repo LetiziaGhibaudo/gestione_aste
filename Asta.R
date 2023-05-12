@@ -39,6 +39,14 @@ Asta <- setRefClass(
     getCsvContent = function() {
       return(c(h_ID, dataInizio, dataFine))
     },
+    isExpired = function() {
+      today <- lubridate::ymd(Sys.Date())
+      end <- lubridate::ymd(dataFine)
+      if (today > end) {
+        return(TRUE)
+      } 
+      return(FALSE)
+    },
     getCsvContentLotti = function(magazzino) {
       i = 1
       data_lotti <- matrix(0, length(lotti), 6)

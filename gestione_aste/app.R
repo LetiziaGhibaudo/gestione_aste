@@ -30,7 +30,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 # Application title
                 titlePanel(strong("ARTEχNE - auction house solution")),
                 
-                mainPanel(tabsetPanel(
+                mainPanel(width = 12, tabsetPanel(
                     # This tab controls the layout of the vendors part
                     tabPanel(
                         "Vendors",
@@ -39,7 +39,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             12,
                             br(),
                             br(),
-                            DT::dataTableOutput("tabellaVenditori")
+                            DT::dataTableOutput("tabellaVenditori", width = "100%")
                         )),
                         br(),
                         br(),
@@ -212,13 +212,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                    br(),
                                    dateInput("dataFine", h3("End time*"),
                                              value = "")),
-                            column(3,
-                                   br(),
-                                   selectInput(
-                                       "asta_ID", label = h3("Auction*"),
-                                       select_asta_ID
-                                   )),
-                            column(3,
+                            column(6,
                                    br(),
                                    selectInput(
                                        "pezzo_ID", label = h3("Piece*"),
@@ -369,7 +363,7 @@ server <- function(input, output, session) {
     
     # Auctions     
     aste$loadAuctions("aste.csv", "lotti.csv")
-    data_aste <- aste$getCsvContentAste()
+    data_aste <- aste$getCsvContentAste(FALSE)
     # We create the auctions table and we hide the column containing the auction ID
     # Thanks to selection = "single", we can select the auction we are interested in (and the lots associated will appear)
     output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
@@ -386,7 +380,7 @@ server <- function(input, output, session) {
             aste$addAuction(nuovaAsta)
             aste$save("aste.csv", "lotti.csv")
             # To update the table and make the new auction visible
-            data_aste <- aste$getCsvContentAste()
+            data_aste <- aste$getCsvContentAste(FALSE)
             output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
             select_asta_ID <- aste$getSelectBoxContentAste()
             a_iv$disable()
@@ -404,11 +398,9 @@ server <- function(input, output, session) {
     data_lotti <- aste$getCsvContentLotti(magazzino)
     select_pezzo_ID <- magazzino$getSelectBoxContentPezzo()
     updateSelectInput(session, "pezzo_ID", choices = select_pezzo_ID)
-    select_asta_ID <- aste$getSelectBoxContentAste()
-    updateSelectInput(session, "asta_ID", choices = select_asta_ID)
     # We create the table of the lots associated to the auction we have selected
     observeEvent(input$tabellaAste_rows_selected, {
-        data_aste <- aste$getCsvContentAste()
+        data_aste <- aste$getCsvContentAste(FALSE)
         data_lotti <- aste$getCsvContentLotti(magazzino)
         id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
         data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
@@ -417,19 +409,19 @@ server <- function(input, output, session) {
     })
     # We verify that all the required fields are filled and that the numeric fields are greater than zero 
     l_iv <- InputValidator$new()
-    l_iv$add_rule("asta_ID", sv_required())
     l_iv$add_rule("pezzo_ID", sv_required())
     l_iv$add_rule("l_prezzoIniziale", sv_gt(0))
     l_iv$add_rule("l_prezzoMartello", sv_gt(0))
     # To add a new lot
     observeEvent(input$addLot, {
+        if (length(input$tabellaAste_rows_selected) > 0) {
         # We verify that the hammer price is greater than (or at least equal to) the starting price 
         l_iv$add_rule("l_prezzoMartello", sv_gte(input$l_prezzoIniziale))
         # If all the required fields are verified we can proceed
         if (l_iv$is_valid()) {
             nuovoLotto = Lotto$new(
                 p_ID = input$pezzo_ID,
-                a_ID = input$asta_ID,
+                a_ID = data_aste[input$tabellaAste_rows_selected, 1],
                 l_pI = as.integer(input$l_prezzoIniziale),
                 l_pM = as.integer(input$l_prezzoMartello))
             aste$addLot(nuovoLotto)
@@ -440,7 +432,6 @@ server <- function(input, output, session) {
             data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]
             output$tabellaLotti <- DT::renderDataTable(data_lotti_sub, options = list(columnDefs = list(list(visible = FALSE, targets = c(1, 4)))))
             l_iv$disable()
-            updateSelectInput(session, "asta_ID", selected = NULL)
             updateSelectInput(session, "pezzo_ID", selected = NULL)
             updateNumericInput(session, "l_prezzoIniziale", value = 0)
             updateNumericInput(session, "l_prezzoMartello", value = 0) 
@@ -449,7 +440,7 @@ server <- function(input, output, session) {
             shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
             l_iv$enable() 
         }
-    }) 
+    }}) 
 }
 
 
