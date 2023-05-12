@@ -170,11 +170,12 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                     tabPanel(
                         "Auctions",
                         verbatimTextOutput("Aste"),
+                            
                         fluidRow(
                             column(
                                 6,
                                 h2(strong("Auctions")),
-                                br(),
+                                checkboxInput("showExpired", "showExpired", FALSE),
                                 br(),
                                 DT::dataTableOutput("tabellaAste")
                             ),
@@ -189,6 +190,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             br(),
                             br(),
                         ),
+                        
                         fluidRow(
                             column(6,
                                    br(),
@@ -367,6 +369,10 @@ server <- function(input, output, session) {
     # We create the auctions table and we hide the column containing the auction ID
     # Thanks to selection = "single", we can select the auction we are interested in (and the lots associated will appear)
     output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
+    observeEvent(input$showExpired, {
+        data_aste <- aste$getCsvContentAste(input$showExpired)
+        output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
+    })
     # We verify that all the required fields are filled
     a_iv <- InputValidator$new()
     a_iv$add_rule("dataInizio", sv_required())
@@ -380,9 +386,8 @@ server <- function(input, output, session) {
             aste$addAuction(nuovaAsta)
             aste$save("aste.csv", "lotti.csv")
             # To update the table and make the new auction visible
-            data_aste <- aste$getCsvContentAste(FALSE)
+            data_aste <- aste$getCsvContentAste(input$showExpired)
             output$tabellaAste <- DT::renderDataTable(data_aste, selection = "single", options = list(columnDefs = list(list(visible = FALSE, targets = c(1)))))
-            select_asta_ID <- aste$getSelectBoxContentAste()
             a_iv$disable()
             updateSelectInput(session, "asta_ID", choices = select_asta_ID)
             updateDateInput(session, "dataInizio", value = NULL)
@@ -400,7 +405,7 @@ server <- function(input, output, session) {
     updateSelectInput(session, "pezzo_ID", choices = select_pezzo_ID)
     # We create the table of the lots associated to the auction we have selected
     observeEvent(input$tabellaAste_rows_selected, {
-        data_aste <- aste$getCsvContentAste(FALSE)
+        data_aste <- aste$getCsvContentAste(input$showExpired)
         data_lotti <- aste$getCsvContentLotti(magazzino)
         id_asta_selezionata <- data_aste[as.character(input$tabellaAste_rows_selected), 1]
         data_lotti_sub <- data_lotti[data_lotti$"Auction ID"  %in% id_asta_selezionata, ]

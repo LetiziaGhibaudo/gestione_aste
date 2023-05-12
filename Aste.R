@@ -40,11 +40,16 @@ Aste <- setRefClass(
     },
     getCsvContentAste = function(showExpired) {
       i = 1
+      length_auctions = 0 
+      for (asta_attuale in auctions) {
+        if ((showExpired == TRUE) || (asta_attuale$isExpired() == FALSE)) {
+          length_auctions = length_auctions + 1
+        }
+      }
+      data_aste <- matrix(0, length_auctions, 3)
       # we create a matrix that will be filled with the auctions data
       for (asta_attuale in auctions) {
         if ((showExpired == TRUE) || (asta_attuale$isExpired() == FALSE)) {
-          ongoing_auctions <- c(asta_attuale$isExpired())
-          data_aste <- matrix(0, length(ongoing_auctions), 3)
           x <- asta_attuale$getCsvContent()
           data_aste[i,] <- x
           i = i + 1
