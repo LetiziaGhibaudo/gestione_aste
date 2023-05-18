@@ -47,18 +47,20 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                                   class = "well",
                                                   h4(class = "text-center", "Please login"),
                                                   p(class = "text-center", 
-                                                    tags$small("First approach login form")
+                                                    tags$small("")
                                                   ),
                                                   
                                                   textInput(
                                                       inputId     = "username", 
-                                                      label       = tagList(icon("user"), "User Name"),
+                                                      label       = tagList(icon("user"), 
+                                                                            "User Name"),
                                                       placeholder = "Enter user name"
                                                   ),
                                                   
                                                   passwordInput(
                                                       inputId     = "password", 
-                                                      label       = tagList(icon("unlock-alt"), "Password"), 
+                                                      label       = tagList(icon("unlock-alt"), 
+                                                                            "Password"), 
                                                       placeholder = "Enter password"
                                                   ), 
                                                   
@@ -71,9 +73,57 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                                       )
                                                   )
                                               )
+                                          ),
+                                     
+                                      div(
+                                          class = "text-center",
+                                          actionButton(
+                                              inputId = "sign_up_button", 
+                                              label = "Sign up",
+                                              class = "btn-primary"
                                           )
-                                          
                                       ),
+                                      br(),
+                                      br(),
+                                      div(
+                                          id = "sign_up_basic", 
+                                          style = "width: 500px; max-width: 100%; margin: 0 auto;",
+                                          
+                                          div(
+                                              class = "well",
+                                              h4(class = "text-center", "Sign up"),
+                                              p(class = "text-center", 
+                                                tags$small("Please choose your username and password")
+                                              ),
+                                              
+                                              textInput(
+                                                  inputId     = "new_username", 
+                                                  label       = tagList(icon("user"), 
+                                                                        "User Name"),
+                                                  placeholder = "Enter user name"
+                                              ),
+                                              
+                                              passwordInput(
+                                                  inputId     = "new_password", 
+                                                  label       = tagList(icon("unlock-alt"), 
+                                                                        "Password"), 
+                                                  placeholder = "Enter password"
+                                              ), 
+                                              
+                                              div(
+                                                  class = "text-center",
+                                                  actionButton(
+                                                      inputId = "create_account_button", 
+                                                      label = "Create account",
+                                                      class = "btn-primary"
+                                                  )
+                                              )
+                                          )
+                                      )
+   
+                                      ),
+                                      
+
                                       
                                       # This tab controls the layout of the vendors part
                                       tabPanel(
@@ -298,6 +348,9 @@ server <- function(input, output, session) {
     hideTab(inputId = "tabs", target = "Vendors")
     hideTab(inputId = "tabs", target = "Pieces")
     hideTab(inputId = "tabs",target = "Auctions")
+    
+    login_management$load("login.csv")
+    print(users)
     observeEvent(input$login_button, {
         if (login_management$login(input$username, input$password) == TRUE ) {
             hideTab(inputId = "tabs", target = "Login")
@@ -307,6 +360,36 @@ server <- function(input, output, session) {
         } else {
             shinyalert("Wrong credentials", "The username or password is incorrect. Please try again", type = "error")
         }
+    })
+    
+    hideElement(id = "sign_up_basic")
+    observeEvent(input$sign_up_button, {
+        showElement(id ="sign_up_basic")
+        u_iv <- InputValidator$new()
+        u_iv$add_rule("new_username", sv_required())
+        u_iv$add_rule("new_password", sv_required())
+        observeEvent(input$create_account_button, {
+            if (u_iv$is_valid()) {
+                if (login_management$verifyUserPassword(input$new_username, input$new_password) == FALSE) {
+                    nuovoUser = Login$new(username = input$new_username,
+                                          password = input$new_password
+                    )
+                    login_management$addUser(nuovoUser)
+                    login_management$save("login.csv")
+                    hideElement(id = "sign_up_basic")
+                    u_iv$disable()
+                    shinyalert("Registration successful ", "You have been succesfully registered. You can now Log in", type = "success")
+                } else {
+                    # If after the verification of the vendor's name and surname it results that they already exist
+                    # an alert will appear
+                    shinyalert("Oops!", "The user already exists", type = "error")
+                }
+            } else {
+                # If after the verification of all the required fields it results that some are empty an alert will appear
+                shinyalert("Oops!", "Please make sure that all required fields are not empty", type = "error")
+                u_iv$enable() 
+            }
+        })
     })
     # Vendors 
     anagrafica$load("prova.csv")
