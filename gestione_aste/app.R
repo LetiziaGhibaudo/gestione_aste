@@ -350,7 +350,6 @@ server <- function(input, output, session) {
     hideTab(inputId = "tabs",target = "Auctions")
     
     login_management$load("login.csv")
-    print(users)
     observeEvent(input$login_button, {
         if (login_management$login(input$username, input$password) == TRUE ) {
             hideTab(inputId = "tabs", target = "Login")
