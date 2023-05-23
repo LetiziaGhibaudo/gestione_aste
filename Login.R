@@ -1,3 +1,5 @@
+# The class Login contains the information about the usernames and passwords, and the functions for 
+# content serialization; thus we can convert the content of a class into a text string and vice versa
 Login <- setRefClass(
   "Login",
   fields = list(
@@ -22,11 +24,6 @@ Login <- setRefClass(
         password <<- unlist(list)[2]
       }
     }
-    
   )
 )
 
-# write.table(x = "admin,admin\nprova,prova\nusername,password",
-#                         file = "~/Documents/GitHub/gestione_aste/login.csv",
-#                         row.names = FALSE, col.names = FALSE, quote = FALSE)
-#             
